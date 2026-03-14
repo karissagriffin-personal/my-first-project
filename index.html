@@ -21,26 +21,22 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
     header h1 { font-size: 18px; letter-spacing: 1px; }
     header span { font-size: 12px; opacity: 0.7; }
 
-    /* ── MAIN LAYOUT ── */
-    .container {
-      display: flex;
-      gap: 16px;
-      padding: 16px;
-      height: calc(100vh - 48px);
-    }
+    /* ── PAGE LAYOUT ── */
+    .page { padding: 16px; max-width: 1400px; margin: 0 auto; }
 
-    /* ── LEFT PANEL (form) ── */
+    /* ── FORM PANEL ── */
     .form-panel {
-      flex: 1;
       background: white;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      display: flex;
-      flex-direction: column;
+      margin-bottom: 16px;
       overflow: hidden;
     }
 
@@ -51,13 +47,14 @@
       background: #f7f9fb;
     }
     .tab {
-      padding: 10px 20px;
+      padding: 10px 24px;
       cursor: pointer;
       font-weight: bold;
       color: #666;
       border-bottom: 3px solid transparent;
       margin-bottom: -2px;
       transition: all 0.2s;
+      font-size: 13px;
     }
     .tab:hover { color: #003d4d; }
     .tab.active {
@@ -65,18 +62,16 @@
       border-bottom-color: #003d4d;
       background: white;
     }
+    .tab.has-error { color: #e63946; }
+    .tab.has-error.active { border-bottom-color: #e63946; }
 
-    /* ── FORM CONTENT ── */
-    .tab-content {
-      padding: 20px;
-      overflow-y: auto;
-      flex: 1;
-    }
+    /* ── TAB CONTENT ── */
+    .tab-content { padding: 20px; }
     .tab-pane { display: none; }
     .tab-pane.active { display: block; }
 
     .section-title {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: bold;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -88,14 +83,10 @@
     }
     .section-title:first-child { margin-top: 0; }
 
-    /* ── TWO-COLUMN GRID ── */
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px 20px;
-    }
+    /* ── GRIDS ── */
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; }
     .grid.three { grid-template-columns: 1fr 1fr 1fr; }
-    .grid.full { grid-template-columns: 1fr; }
+    .grid.four { grid-template-columns: 1fr 1fr 1fr 1fr; }
 
     .field { display: flex; flex-direction: column; gap: 4px; }
     .field label {
@@ -133,12 +124,13 @@
       color: #c1121f;
       padding: 10px 16px;
       border-radius: 5px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       font-size: 13px;
       display: none;
+      line-height: 1.6;
     }
 
-    /* ── RUN QUOTES BUTTON ── */
+    /* ── FOOTER BAR ── */
     .footer-bar {
       padding: 12px 20px;
       border-top: 1px solid #e0e0e0;
@@ -151,7 +143,7 @@
       background: #003d4d;
       color: white;
       border: none;
-      padding: 10px 32px;
+      padding: 10px 36px;
       border-radius: 5px;
       font-size: 14px;
       font-weight: bold;
@@ -170,81 +162,355 @@
     }
     .btn-clear:hover { background: #f0f0f0; }
 
-    /* ── RIGHT PANEL (results) ── */
+    /* ── RESULTS PANEL ── */
     .results-panel {
-      width: 380px;
       background: white;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      display: flex;
-      flex-direction: column;
       overflow: hidden;
+      display: none;
     }
+    .results-panel.visible { display: block; }
+
     .results-header {
       background: #003d4d;
       color: white;
-      padding: 12px 16px;
-      font-weight: bold;
-      font-size: 13px;
-      letter-spacing: 0.5px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .results-body {
-      padding: 16px;
-      overflow-y: auto;
-      flex: 1;
+    .results-header h2 { font-size: 14px; letter-spacing: 0.5px; }
+    .results-meta { font-size: 12px; opacity: 0.8; }
+
+    /* ── SORT BAR ── */
+    .sort-bar {
+      padding: 10px 20px;
+      background: #f7f9fb;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: #666;
     }
-    .results-empty {
-      color: #aaa;
-      font-size: 13px;
-      text-align: center;
-      margin-top: 60px;
-      line-height: 1.8;
+    .sort-btn {
+      padding: 4px 12px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      background: white;
+      cursor: pointer;
+      font-size: 12px;
+      color: #333;
+    }
+    .sort-btn.active {
+      background: #003d4d;
+      color: white;
+      border-color: #003d4d;
     }
 
-    /* ── CARRIER QUOTE CARD ── */
-    .carrier-card {
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      padding: 14px;
-      margin-bottom: 12px;
-      transition: box-shadow 0.2s;
+    /* ── CARRIER COMPARISON TABLE ── */
+    .comparison-wrapper {
+      overflow-x: auto;
+      padding: 20px;
     }
-    .carrier-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .carrier-card.best {
-      border-color: #0a9396;
-      background: #f0fafa;
-    }
-    .carrier-top {
+    .comparison-table {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
+      gap: 16px;
+      min-width: max-content;
     }
-    .carrier-name { font-weight: bold; font-size: 14px; color: #003d4d; }
-    .carrier-price { font-size: 20px; font-weight: bold; color: #003d4d; }
-    .carrier-price span { font-size: 12px; font-weight: normal; color: #888; }
-    .carrier-details { font-size: 12px; color: #666; line-height: 1.8; }
-    .badge-best {
+
+    /* ── CARRIER COLUMN ── */
+    .carrier-col {
+      width: 240px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+      flex-shrink: 0;
+    }
+    .carrier-col:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .carrier-col.selected {
+      border-color: #0a9396;
+      box-shadow: 0 0 0 2px #0a9396;
+    }
+
+    /* Elephant featured column */
+    .carrier-col.elephant {
+      width: 260px;
+      border-color: #003d4d;
+      border-width: 2px;
+    }
+
+    .carrier-header {
+      padding: 14px;
+      background: #f7f9fb;
+      border-bottom: 1px solid #e0e0e0;
+      text-align: center;
+    }
+    .carrier-col.elephant .carrier-header {
+      background: #003d4d;
+      color: white;
+    }
+
+    .carrier-badge {
+      display: inline-block;
       background: #0a9396;
       color: white;
       font-size: 10px;
       padding: 2px 8px;
       border-radius: 20px;
       font-weight: bold;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
     }
-    .btn-select {
+    .carrier-col.elephant .carrier-badge {
+      background: white;
+      color: #003d4d;
+    }
+
+    .carrier-name-display {
+      font-weight: bold;
+      font-size: 15px;
+      margin-bottom: 2px;
+    }
+    .carrier-col.elephant .carrier-name-display { color: white; }
+
+    .carrier-tagline {
+      font-size: 11px;
+      color: #888;
+    }
+    .carrier-col.elephant .carrier-tagline { color: rgba(255,255,255,0.7); }
+
+    /* Price section */
+    .carrier-price-section {
+      padding: 16px 14px;
+      text-align: center;
+      border-bottom: 1px solid #e0e0e0;
+      background: white;
+    }
+    .price-monthly {
+      font-size: 32px;
+      font-weight: bold;
+      color: #003d4d;
+      line-height: 1;
+    }
+    .price-monthly span { font-size: 14px; font-weight: normal; color: #888; }
+    .price-sixmo {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+    .price-annual {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 2px;
+    }
+
+    /* Coverage rows */
+    .carrier-coverages {
+      padding: 12px 14px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .coverage-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      padding: 3px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .coverage-row:last-child { border-bottom: none; }
+    .coverage-label { color: #888; }
+    .coverage-value { font-weight: bold; color: #333; }
+
+    /* Notes */
+    .carrier-notes {
+      padding: 10px 14px;
+      background: #fffbf0;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 11px;
+      color: #888;
+      min-height: 36px;
+    }
+    .note-tag {
+      display: inline-block;
+      background: #e8f4f8;
+      color: #005f73;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin: 2px 2px 2px 0;
+      font-size: 10px;
+    }
+    .note-tag.surcharge {
+      background: #fff0f0;
+      color: #c1121f;
+    }
+
+    /* Actions */
+    .carrier-actions {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .btn-select-quote {
       width: 100%;
-      margin-top: 10px;
-      padding: 7px;
+      padding: 9px;
       background: #003d4d;
       color: white;
       border: none;
-      border-radius: 4px;
-      font-size: 12px;
-      cursor: pointer;
+      border-radius: 5px;
+      font-size: 13px;
       font-weight: bold;
+      cursor: pointer;
     }
-    .btn-select:hover { background: #005f73; }
+    .btn-select-quote:hover { background: #005f73; }
+    .carrier-col.elephant .btn-select-quote {
+      background: #0a9396;
+    }
+    .carrier-col.elephant .btn-select-quote:hover { background: #007f82; }
+
+    .btn-launch {
+      width: 100%;
+      padding: 8px;
+      background: white;
+      color: #003d4d;
+      border: 1px solid #003d4d;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+    }
+    .btn-launch:hover { background: #eef2f5; }
+
+    /* ── MODAL OVERLAY ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.visible { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 10px;
+      width: 620px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+      background: #003d4d;
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+    }
+    .modal-header h3 { font-size: 16px; }
+    .modal-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+      opacity: 0.8;
+    }
+    .modal-close:hover { opacity: 1; }
+
+    .modal-body { padding: 20px; }
+
+    .modal-section { margin-bottom: 20px; }
+    .modal-section-title {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #003d4d;
+      border-bottom: 1px solid #e0e7ea;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 20px;
+      font-size: 13px;
+    }
+    .modal-row { display: flex; flex-direction: column; gap: 2px; }
+    .modal-row-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+    .modal-row-value { font-weight: bold; color: #222; }
+
+    .price-breakdown {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      text-align: center;
+    }
+    .price-box {
+      background: #f7f9fb;
+      border-radius: 6px;
+      padding: 12px;
+    }
+    .price-box-label { font-size: 11px; color: #888; margin-bottom: 4px; }
+    .price-box-value { font-size: 22px; font-weight: bold; color: #003d4d; }
+    .price-box-value span { font-size: 12px; font-weight: normal; color: #888; }
+
+    .modal-notes {
+      background: #fffbf0;
+      border: 1px solid #ffe57f;
+      border-radius: 5px;
+      padding: 12px;
+      font-size: 12px;
+      color: #666;
+      line-height: 1.8;
+    }
+
+    .modal-footer {
+      padding: 16px 20px;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      background: #f7f9fb;
+      position: sticky;
+      bottom: 0;
+    }
+    .btn-modal-close {
+      padding: 10px 20px;
+      background: none;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #666;
+    }
+    .btn-modal-launch {
+      padding: 10px 24px;
+      background: #003d4d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-modal-launch:hover { background: #005f73; }
   </style>
 </head>
 <body>
@@ -252,23 +518,20 @@
   <!-- TOP BAR -->
   <header>
     <h1>🏢 Agency Rater</h1>
-    <span>Agent Desktop Tool — v1.0</span>
+    <span>Agent Desktop Tool — v2.0</span>
   </header>
 
-  <div class="container">
+  <div class="page">
 
-    <!-- LEFT: FORM PANEL -->
+    <!-- FORM PANEL -->
     <div class="form-panel">
-
-      <!-- TABS -->
       <div class="tabs">
-        <div class="tab active" onclick="switchTab('applicant')">Applicant</div>
-        <div class="tab" onclick="switchTab('vehicle')">Vehicle</div>
-        <div class="tab" onclick="switchTab('drivers')">Drivers</div>
-        <div class="tab" onclick="switchTab('coverage')">Coverage</div>
+        <div class="tab active" id="tab-btn-applicant" onclick="switchTab('applicant')">Applicant</div>
+        <div class="tab" id="tab-btn-vehicle" onclick="switchTab('vehicle')">Vehicle</div>
+        <div class="tab" id="tab-btn-drivers" onclick="switchTab('drivers')">Drivers</div>
+        <div class="tab" id="tab-btn-coverage" onclick="switchTab('coverage')">Coverage</div>
       </div>
 
-      <!-- FORM CONTENT -->
       <div class="tab-content">
 
         <!-- APPLICANT TAB -->
@@ -277,20 +540,18 @@
           <div class="grid three">
             <div class="field">
               <label>First Name</label>
-              <input type="text" id="firstName" placeholder="First Name" />
+              <input type="text" id="firstName" />
             </div>
             <div class="field">
               <label>Last Name</label>
-              <input type="text" id="lastName" placeholder="Last Name" />
+              <input type="text" id="lastName" />
             </div>
             <div class="field">
               <label>Suffix</label>
               <select id="suffix">
                 <option value="">None</option>
-                <option>Jr.</option>
-                <option>Sr.</option>
-                <option>II</option>
-                <option>III</option>
+                <option>Jr.</option><option>Sr.</option>
+                <option>II</option><option>III</option>
               </select>
             </div>
             <div class="field">
@@ -301,62 +562,51 @@
               <label>Gender</label>
               <select id="gender">
                 <option value="">Select</option>
-                <option>Male</option>
-                <option>Female</option>
-                <option>Non-binary</option>
+                <option>Male</option><option>Female</option><option>Non-binary</option>
               </select>
             </div>
             <div class="field">
               <label>Marital Status</label>
               <select id="maritalStatus">
                 <option value="">Select</option>
-                <option>Single</option>
-                <option>Married</option>
-                <option>Divorced</option>
-                <option>Widowed</option>
+                <option>Single</option><option>Married</option>
+                <option>Divorced</option><option>Widowed</option>
               </select>
             </div>
           </div>
 
           <div class="section-title">Address</div>
-          <div class="grid">
+          <div class="grid four">
             <div class="field">
               <label>Street Address</label>
               <input type="text" id="address" />
+            </div>
+            <div class="field">
+              <label>City</label>
+              <input type="text" id="city" />
+            </div>
+            <div class="field">
+              <label>State</label>
+              <select id="state">
+                <option value="">Select</option>
+                <option>VA</option><option>TX</option><option>TN</option>
+                <option>IN</option><option>IL</option><option>OH</option><option>GA</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>ZIP Code</label>
+              <input type="text" id="zip" maxlength="5" />
             </div>
             <div class="field">
               <label>Apt / Unit</label>
               <input type="text" id="apt" placeholder="Optional" />
             </div>
             <div class="field">
-              <label>City</label>
-              <input type="text" id="city"  />
-            </div>
-            <div class="field">
-              <label>State</label>
-              <select id="state">
-                <option value="">Select</option>
-                <option>VA</option>
-                <option>TX</option>
-                <option>TN</option>
-                <option>IN</option>
-                <option>IL</option>
-                <option>OH</option>
-                <option>GA</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>ZIP Code</label>
-              <input type="text" id="zip"  maxlength="5" />
-            </div>
-            <div class="field">
               <label>Residence Type</label>
               <select id="homeType">
                 <option value="">Select</option>
-                <option>Own Home</option>
-                <option>Rent</option>
-                <option>Own Condo</option>
-                <option>Own Mobile Home</option>
+                <option>Own Home</option><option>Rent</option>
+                <option>Own Condo</option><option>Own Mobile Home</option>
                 <option>Live with Parents</option>
               </select>
             </div>
@@ -370,7 +620,7 @@
             </div>
             <div class="field">
               <label>Phone</label>
-              <input type="tel" id="phone"/>
+              <input type="tel" id="phone" />
             </div>
           </div>
         </div>
@@ -378,48 +628,44 @@
         <!-- VEHICLE TAB -->
         <div class="tab-pane" id="tab-vehicle">
           <div class="section-title">Vehicle Information</div>
-          <div class="grid three">
+          <div class="grid four">
             <div class="field">
               <label>Year</label>
               <input type="number" id="vehicleYear" min="1981" max="2026" />
             </div>
             <div class="field">
               <label>Make</label>
-              <input type="text" id="vehicleMake"/>
+              <input type="text" id="vehicleMake" />
             </div>
             <div class="field">
               <label>Model</label>
-              <input type="text" id="vehicleModel"/>
+              <input type="text" id="vehicleModel" />
             </div>
             <div class="field">
               <label>Trim</label>
-              <input type="text" id="vehicleTrim" placeholder="LE, XLE, SE..." />
+              <input type="text" id="vehicleTrim" placeholder="Optional" />
             </div>
             <div class="field">
               <label>VIN</label>
-              <input type="text" id="vin" />
+              <input type="text" id="vin" placeholder="Optional" />
             </div>
             <div class="field">
               <label>Ownership</label>
               <select id="vehicleOwnership">
                 <option value="">Select</option>
-                <option>Owned</option>
-                <option>Financed</option>
-                <option>Leased</option>
+                <option>Owned</option><option>Financed</option><option>Leased</option>
               </select>
             </div>
           </div>
 
           <div class="section-title">Usage</div>
-          <div class="grid">
+          <div class="grid four">
             <div class="field">
               <label>Primary Use</label>
               <select id="vehicleUse">
                 <option value="">Select</option>
-                <option>Commute</option>
-                <option>Pleasure</option>
-                <option>Business</option>
-                <option>Farm</option>
+                <option>Commute</option><option>Pleasure</option>
+                <option>Business</option><option>Farm</option>
               </select>
             </div>
             <div class="field">
@@ -442,7 +688,7 @@
                 <option value="yes">Yes</option>
               </select>
             </div>
- <div class="field">
+            <div class="field">
               <label>Garaging ZIP</label>
               <select id="garagingZipSelect" onchange="handleGaragingZip()">
                 <option value="">Select</option>
@@ -450,8 +696,7 @@
                 <option value="other">Other — Enter Manually</option>
               </select>
               <input type="text" id="garagingZipManual" maxlength="5"
-                placeholder="Enter ZIP"
-                style="display:none; margin-top:6px;" />
+                placeholder="Enter ZIP" style="display:none; margin-top:6px;" />
             </div>
           </div>
         </div>
@@ -459,23 +704,18 @@
         <!-- DRIVERS TAB -->
         <div class="tab-pane" id="tab-drivers">
           <div class="section-title">Primary Driver</div>
-          <div class="grid">
+          <div class="grid four">
             <div class="field">
               <label>License State</label>
               <select id="licenseState">
                 <option value="">Select</option>
-                <option>VA</option>
-                <option>TX</option>
-                <option>TN</option>
-                <option>IN</option>
-                <option>IL</option>
-                <option>OH</option>
-                <option>GA</option>
+                <option>VA</option><option>TX</option><option>TN</option>
+                <option>IN</option><option>IL</option><option>OH</option><option>GA</option>
               </select>
             </div>
             <div class="field">
               <label>Age First Licensed</label>
-              <input type="number" id="ageLicensed" placeholder="16" min="14" max="99" />
+              <input type="number" id="ageLicensed" min="14" max="99" />
             </div>
             <div class="field">
               <label>Violations (last 5 yrs)</label>
@@ -511,7 +751,7 @@
           </div>
 
           <div class="section-title">Current Insurance</div>
-          <div class="grid">
+          <div class="grid four">
             <div class="field">
               <label>Currently Insured?</label>
               <select id="currentlyInsured">
@@ -537,11 +777,8 @@
               <label>Reason for Shopping</label>
               <select id="shoppingReason">
                 <option value="">Select</option>
-                <option>Price</option>
-                <option>Coverage</option>
-                <option>New Vehicle</option>
-                <option>Life Change</option>
-                <option>Renewal</option>
+                <option>Price</option><option>Coverage</option>
+                <option>New Vehicle</option><option>Life Change</option><option>Renewal</option>
               </select>
             </div>
           </div>
@@ -550,7 +787,7 @@
         <!-- COVERAGE TAB -->
         <div class="tab-pane" id="tab-coverage">
           <div class="section-title">Liability</div>
-          <div class="grid">
+          <div class="grid four">
             <div class="field">
               <label>Bodily Injury Limits</label>
               <select id="liability">
@@ -589,7 +826,7 @@
           </div>
 
           <div class="section-title">Physical Damage</div>
-          <div class="grid">
+          <div class="grid four">
             <div class="field">
               <label>Comprehensive Deductible</label>
               <select id="compDeductible">
@@ -611,7 +848,7 @@
           </div>
 
           <div class="section-title">Add-ons</div>
-          <div class="grid">
+          <div class="grid four">
             <div class="field">
               <label>Roadside Assistance</label>
               <select id="roadside">
@@ -642,7 +879,7 @@
             </div>
           </div>
 
-          <div class="section-title">Effective Date</div>
+          <div class="section-title">Effective Date &amp; Payment</div>
           <div class="grid">
             <div class="field">
               <label>Requested Effective Date</label>
@@ -661,62 +898,64 @@
 
       </div><!-- end tab-content -->
 
-      <!-- FOOTER BAR -->
       <div class="footer-bar">
         <button class="btn-clear" onclick="clearForm()">Clear Form</button>
         <button class="btn-run" onclick="runQuotes()">⚡ Run Quotes</button>
       </div>
-
     </div><!-- end form-panel -->
 
-    <!-- RIGHT: RESULTS PANEL -->
-    <div class="results-panel">
-      <div class="results-header">📋 Quote Results</div>
-      <div class="results-body" id="resultsBody">
-        <div class="results-empty">
-          Fill out applicant information<br />and click <strong>Run Quotes</strong><br />to see carrier results.
-        </div>
+    <!-- RESULTS PANEL -->
+    <div class="results-panel" id="resultsPanel">
+      <div class="results-header">
+        <h2>📋 Quote Results</h2>
+        <div class="results-meta" id="resultsMeta"></div>
+      </div>
+      <div class="sort-bar">
+        Sort by:
+        <button class="sort-btn active" onclick="sortResults('price', this)">Price ↑</button>
+        <button class="sort-btn" onclick="sortResults('carrier', this)">Carrier Name</button>
+      </div>
+      <div class="comparison-wrapper">
+        <div class="comparison-table" id="comparisonTable"></div>
       </div>
     </div>
 
-  </div><!-- end container -->
+  </div><!-- end page -->
+
+  <!-- QUOTE DETAIL MODAL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBackdrop(event)">
+    <div class="modal" id="modalContent"></div>
+  </div>
 
   <script>
-   // Tab switching
+
+    // ── TAB SWITCHING ──
     function switchTab(name) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
       document.getElementById('tab-' + name).classList.add('active');
-      event.target.classList.add('active');
+      document.getElementById('tab-btn-' + name).classList.add('active');
     }
 
-    // Smart garaging ZIP
+    // ── GARAGING ZIP ──
     function handleGaragingZip() {
       const sel = document.getElementById('garagingZipSelect').value;
       const manual = document.getElementById('garagingZipManual');
-      if (sel === 'other') {
-        manual.style.display = 'block';
-        manual.focus();
-      } else {
-        manual.style.display = 'none';
-      }
+      manual.style.display = sel === 'other' ? 'block' : 'none';
+      if (sel === 'other') manual.focus();
     }
 
-    // Update garaging ZIP dropdown when applicant ZIP changes
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('zip').addEventListener('input', function() {
         const opt = document.getElementById('garagingZipSame');
-        if (this.value.length === 5) {
-          opt.textContent = `Same as Applicant ZIP (${this.value})`;
-        } else {
-          opt.textContent = 'Same as Applicant ZIP';
-        }
+        opt.textContent = this.value.length === 5
+          ? `Same as Applicant ZIP (${this.value})`
+          : 'Same as Applicant ZIP';
       });
     });
 
-    // Validation
+    // ── VALIDATION ──
     function validate() {
-      let valid = true;
       const required = [
         { id: 'firstName', tab: 'applicant', label: 'First Name' },
         { id: 'lastName', tab: 'applicant', label: 'Last Name' },
@@ -733,12 +972,11 @@
         { id: 'licenseState', tab: 'drivers', label: 'License State' },
       ];
 
-      // Clear previous errors
       document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
       document.querySelectorAll('.error-msg').forEach(e => e.remove());
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('has-error'));
 
       const errorFields = [];
-
       required.forEach(f => {
         const el = document.getElementById(f.id);
         if (!el.value || el.value.trim() === '') {
@@ -747,12 +985,10 @@
           msg.className = 'error-msg';
           msg.textContent = `${f.label} is required`;
           el.parentNode.appendChild(msg);
-          errorFields.push({ ...f, el });
-          valid = false;
+          errorFields.push(f);
         }
       });
 
-      // Show banner if errors
       let banner = document.getElementById('validationBanner');
       if (!banner) {
         banner = document.createElement('div');
@@ -761,55 +997,53 @@
         document.querySelector('.tab-content').prepend(banner);
       }
 
-      if (!valid) {
+      if (errorFields.length > 0) {
         const tabs = {};
         errorFields.forEach(f => {
           if (!tabs[f.tab]) tabs[f.tab] = [];
           tabs[f.tab].push(f.label);
+          document.getElementById('tab-btn-' + f.tab).classList.add('has-error');
         });
         const tabNames = { applicant: 'Applicant', vehicle: 'Vehicle', drivers: 'Drivers', coverage: 'Coverage' };
-        let msg = '⚠️ Please complete required fields: ';
-        msg += Object.entries(tabs).map(([tab, fields]) =>
-          `<strong>${tabNames[tab]}</strong> (${fields.join(', ')})`
-        ).join(' — ');
-        banner.innerHTML = msg;
+        banner.innerHTML = '⚠️ Please complete required fields: ' +
+          Object.entries(tabs).map(([t, fields]) =>
+            `<strong>${tabNames[t]}</strong> (${fields.join(', ')})`
+          ).join(' — ');
         banner.style.display = 'block';
-
-        // Jump to first tab with errors
-        const firstErrorTab = errorFields[0].tab;
+        const firstTab = errorFields[0].tab;
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-        document.getElementById('tab-' + firstErrorTab).classList.add('active');
-        document.querySelector(`.tab[onclick="switchTab('${firstErrorTab}')"]`).classList.add('active');
-      } else {
-        banner.style.display = 'none';
+        document.getElementById('tab-' + firstTab).classList.add('active');
+        document.getElementById('tab-btn-' + firstTab).classList.add('active');
+        return false;
       }
 
-      return valid;
+      banner.style.display = 'none';
+      return true;
     }
 
-    // Clear form
+    // ── CLEAR FORM ──
     function clearForm() {
-      if (confirm('Clear all fields?')) {
-        document.querySelectorAll('input').forEach(i => i.value = '');
-        document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
-        document.getElementById('garagingZipManual').style.display = 'none';
-        document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
-        document.querySelectorAll('.error-msg').forEach(e => e.remove());
-        const banner = document.getElementById('validationBanner');
-        if (banner) banner.style.display = 'none';
-        document.getElementById('resultsBody').innerHTML =
-          '<div class="results-empty">Fill out applicant information<br />and click <strong>Run Quotes</strong><br />to see carrier results.</div>';
-      }
+      if (!confirm('Clear all fields?')) return;
+      document.querySelectorAll('input').forEach(i => i.value = '');
+      document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+      document.getElementById('garagingZipManual').style.display = 'none';
+      document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
+      document.querySelectorAll('.error-msg').forEach(e => e.remove());
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('has-error'));
+      const banner = document.getElementById('validationBanner');
+      if (banner) banner.style.display = 'none';
+      document.getElementById('resultsPanel').classList.remove('visible');
     }
 
-    // Run Quotes
-    function runQuotes() {
-      if (!validate()) return;
+    // ── RATING ENGINE ──
+    let quoteResults = [];
 
+    function calcPremium(carrierBase) {
       const dob = new Date(document.getElementById('dob').value);
-      const age = dob ? Math.floor((new Date() - dob) / (365.25*24*60*60*1000)) : 35;
+      const age = Math.floor((new Date() - dob) / (365.25*24*60*60*1000));
       const violations = document.getElementById('violations').value;
+      const sr22 = document.getElementById('sr22').value;
       const homeType = document.getElementById('homeType').value;
       const mileage = parseInt(document.getElementById('annualMileage').value) || 12000;
       const ownership = document.getElementById('vehicleOwnership').value;
@@ -824,78 +1058,434 @@
       const defensiveDriving = document.getElementById('defensiveDriving').value;
       const antiTheft = document.getElementById('antiTheft').value;
       const paymentPlan = document.getElementById('paymentPlan').value;
-      const sr22 = document.getElementById('sr22').value;
 
-      function calcBase(carrierBase) {
-        let b = carrierBase;
-        if (age < 25) b += 45;
-        else if (age < 30) b += 20;
-        else if (age > 70) b += 18;
-        if (violations === 'ticket') b += 22;
-        else if (violations === 'accident') b += 40;
-        else if (violations === 'dui') b += 85;
-        else if (violations === 'multiple') b += 100;
-        if (sr22 === 'yes') b += 30;
-        if (homeType === 'Own Home' || homeType === 'Own Condo') b -= 8;
-        if (mileage > 15000) b += 15;
-        if (ownership === 'Financed' || ownership === 'Leased') b += 10;
-        if (liability === '50/100') b += 10;
-        else if (liability === '100/300') b += 22;
-        else if (liability === '250/500') b += 42;
-        if (comp !== 'none') b += comp === '250' ? 20 : comp === '500' ? 13 : 7;
-        if (coll !== 'none') b += coll === '250' ? 25 : coll === '500' ? 17 : 9;
-        if (roadside === 'yes') b += 5;
-        if (rental === 'yes') b += 4;
-        if (accForgiveness === 'yes') b += 8;
-        if (newCar === 'yes') b += 10;
-        if (goodStudent === 'yes') b -= 8;
-        if (defensiveDriving === 'yes') b -= 6;
-        if (antiTheft === 'yes') b -= 5;
-        if (paymentPlan === 'paid-in-full') b = Math.round(b * 0.95);
-        return Math.max(b, 40);
-      }
-
-      const carriers = [
-        { name: 'Carrier A — Bristol West', base: 78, color: '#1a6b8a' },
-        { name: 'Carrier B — Progressive', base: 85, color: '#0077c8' },
-        { name: 'Carrier C — Nationwide', base: 92, color: '#004b87' },
-        { name: 'Carrier D — Safeco', base: 88, color: '#c8392b' },
-      ];
-
-      const results = carriers.map(c => ({
-        name: c.name,
-        color: c.color,
-        monthly: calcBase(c.base),
-      })).sort((a, b) => a.monthly - b.monthly);
-
-      const name = document.getElementById('firstName').value;
-      const vehicle = `${document.getElementById('vehicleYear').value} ${document.getElementById('vehicleMake').value} ${document.getElementById('vehicleModel').value}`.trim();
-
-      let html = `<div style="font-size:12px;color:#888;margin-bottom:12px;">
-        Applicant: <strong>${name} ${document.getElementById('lastName').value}</strong><br>
-        Vehicle: <strong>${vehicle}</strong><br>
-        Coverage: <strong>${liability} BI</strong> &nbsp;|&nbsp; Comp/Coll: <strong>${comp}/${coll}</strong>
-      </div>`;
-
-      results.forEach((r, i) => {
-        html += `
-          <div class="carrier-card ${i === 0 ? 'best' : ''}">
-            <div class="carrier-top">
-              <div class="carrier-name" style="color:${r.color}">${r.name}</div>
-              ${i === 0 ? '<span class="badge-best">LOWEST</span>' : ''}
-            </div>
-            <div class="carrier-price">$${r.monthly}<span>/mo</span></div>
-            <div class="carrier-details">
-              6-month premium: <strong>$${r.monthly * 6}</strong><br>
-              Liability: ${liability} &nbsp;|&nbsp; Comp: ${comp} &nbsp;|&nbsp; Coll: ${coll}
-            </div>
-            <button class="btn-select">Select This Quote →</button>
-          </div>`;
-      });
-
-      document.getElementById('resultsBody').innerHTML = html;
+      let b = carrierBase;
+      if (age < 25) b += 45; else if (age < 30) b += 20; else if (age > 70) b += 18;
+      if (violations === 'ticket') b += 22;
+      else if (violations === 'accident') b += 40;
+      else if (violations === 'dui') b += 85;
+      else if (violations === 'multiple') b += 100;
+      if (sr22 === 'yes') b += 30;
+      if (homeType === 'Own Home' || homeType === 'Own Condo') b -= 8;
+      if (mileage > 15000) b += 15;
+      if (ownership === 'Financed' || ownership === 'Leased') b += 10;
+      if (liability === '50/100') b += 10;
+      else if (liability === '100/300') b += 22;
+      else if (liability === '250/500') b += 42;
+      if (comp !== 'none') b += comp === '250' ? 20 : comp === '500' ? 13 : 7;
+      if (coll !== 'none') b += coll === '250' ? 25 : coll === '500' ? 17 : 9;
+      if (roadside === 'yes') b += 5;
+      if (rental === 'yes') b += 4;
+      if (accForgiveness === 'yes') b += 8;
+      if (newCar === 'yes') b += 10;
+      if (goodStudent === 'yes') b -= 8;
+      if (defensiveDriving === 'yes') b -= 6;
+      if (antiTheft === 'yes') b -= 5;
+      if (paymentPlan === 'paid-in-full') b = Math.round(b * 0.95);
+      return Math.max(b, 40);
     }
-  </script>
 
+    function buildNotes() {
+      const notes = [];
+      const dob = new Date(document.getElementById('dob').value);
+      const age = Math.floor((new Date() - dob) / (365.25*24*60*60*1000));
+      const violations = document.getElementById('violations').value;
+      const sr22 = document.getElementById('sr22').value;
+      const goodStudent = document.getElementById('goodStudent').value;
+      const defensiveDriving = document.getElementById('defensiveDriving').value;
+      const antiTheft = document.getElementById('antiTheft').value;
+      const paymentPlan = document.getElementById('paymentPlan').value;
+      const homeType = document.getElementById('homeType').value;
+      const mileage = parseInt(document.getElementById('annualMileage').value) || 0;
+      const currentlyInsured = document.getElementById('currentlyInsured').value;
+
+      if (age < 25) notes.push({ text: 'Young driver surcharge', type: 'surcharge' });
+      if (violations === 'ticket') notes.push({ text: 'Speeding ticket surcharge', type: 'surcharge' });
+      if (violations === 'accident') notes.push({ text: 'At-fault accident surcharge', type: 'surcharge' });
+      if (violations === 'dui') notes.push({ text: 'DUI surcharge applied', type: 'surcharge' });
+      if (violations === 'multiple') notes.push({ text: 'Multiple incidents surcharge', type: 'surcharge' });
+      if (sr22 === 'yes') notes.push({ text: 'SR-22 surcharge', type: 'surcharge' });
+      if (mileage > 15000) notes.push({ text: 'High mileage surcharge', type: 'surcharge' });
+      if (goodStudent === 'yes') notes.push({ text: 'Good student discount', type: 'discount' });
+      if (defensiveDriving === 'yes') notes.push({ text: 'Defensive driver discount', type: 'discount' });
+      if (antiTheft === 'yes') notes.push({ text: 'Anti-theft discount', type: 'discount' });
+      if (paymentPlan === 'paid-in-full') notes.push({ text: 'Paid-in-full discount (5%)', type: 'discount' });
+      if (homeType === 'Own Home' || homeType === 'Own Condo') notes.push({ text: 'Homeowner discount', type: 'discount' });
+      if (currentlyInsured === 'yes') notes.push({ text: 'Prior insurance discount', type: 'discount' });
+      if (notes.length === 0) notes.push({ text: 'No surcharges or discounts applied', type: 'discount' });
+      return notes;
+    }
+
+    // ── RUN QUOTES ──
+    function runQuotes() {
+      if (!validate()) return;
+
+      const zip = document.getElementById('zip').value;
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const dob = document.getElementById('dob').value;
+      const vehicleYear = document.getElementById('vehicleYear').value;
+      const vehicleMake = document.getElementById('vehicleMake').value;
+      const vehicleModel = document.getElementById('vehicleModel').value;
+      const liability = document.getElementById('liability').value;
+      const comp = document.getElementById('compDeductible').value;
+      const coll = document.getElementById('collDeductible').value;
+
+      const notes = buildNotes();
+
+      // Elephant is always first and uses the real quote URL
+      quoteResults = [
+        {
+          id: 'elephant',
+          name: 'Elephant Insurance',
+          tagline: 'Preferred Partner',
+          isElephant: true,
+          base: 76,
+          launchUrl: `https://quotes.elephant.com/start/name?zip=${zip}`,
+          launchLabel: 'Launch Elephant Quote →'
+        },
+        {
+          id: 'bristol',
+          name: 'Bristol West',
+          tagline: 'Non-Standard Auto',
+          isElephant: false,
+          base: 82,
+          launchUrl: `https://www.bristolwest.com/`,
+          launchLabel: 'Launch Bristol West →'
+        },
+        {
+          id: 'progressive',
+          name: 'Progressive',
+          tagline: 'Name Your Price®',
+          isElephant: false,
+          base: 88,
+          launchUrl: `https://www.progressive.com/auto/`,
+          launchLabel: 'Launch Progressive →'
+        },
+        {
+          id: 'dairyland',
+          name: 'Dairyland Auto',
+          tagline: 'SR-22 & Non-Standard Specialist',
+          isElephant: false,
+          base: 98,
+          launchUrl: `https://www.dairyland.com/`,
+          launchLabel: 'Launch Dairyland →'
+        },
+        {
+          id: 'lemonade',
+          name: 'Lemonade Auto',
+          tagline: 'Tech-Forward. Flat Fee.',
+          isElephant: false,
+          base: 86,
+          launchUrl: `https://www.lemonade.com/car/`,
+          launchLabel: 'Launch Lemonade →'
+        },
+        {
+          id: 'safeco',
+          name: 'Safeco',
+          tagline: 'A Liberty Mutual Company',
+          isElephant: false,
+          base: 90,
+          launchUrl: `https://www.safeco.com/`,
+          launchLabel: 'Launch Safeco →'
+        },
+      ].map(c => ({
+        ...c,
+        monthly: calcPremium(c.base),
+        notes,
+      }));
+
+      renderResults();
+
+      document.getElementById('resultsMeta').textContent =
+        `${firstName} ${lastName} | ${vehicleYear} ${vehicleMake} ${vehicleModel} | ${liability} BI | Comp: ${comp} / Coll: ${coll}`;
+
+      document.getElementById('resultsPanel').classList.add('visible');
+      document.getElementById('resultsPanel').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ── RENDER RESULTS ──
+    function renderResults() {
+      const liability = document.getElementById('liability').value;
+      const comp = document.getElementById('compDeductible').value;
+      const coll = document.getElementById('collDeductible').value;
+      const umUim = document.getElementById('umUim').value;
+      const medPay = document.getElementById('medPay').value;
+      const roadside = document.getElementById('roadside').value;
+      const rental = document.getElementById('rental').value;
+
+      // Elephant always first, others sorted by price
+      const elephant = quoteResults.find(c => c.isElephant);
+      const others = quoteResults.filter(c => !c.isElephant)
+        .sort((a, b) => a.monthly - b.monthly);
+      const sorted = [elephant, ...others];
+
+      const table = document.getElementById('comparisonTable');
+      table.innerHTML = '';
+
+      sorted.forEach((carrier, idx) => {
+        const isLowest = !carrier.isElephant && carrier.monthly === Math.min(...others.map(o => o.monthly));
+        const col = document.createElement('div');
+        col.className = `carrier-col${carrier.isElephant ? ' elephant' : ''}`;
+        col.id = `col-${carrier.id}`;
+
+        const noteTags = carrier.notes.map(n =>
+          `<span class="note-tag ${n.type === 'surcharge' ? 'surcharge' : ''}">${n.text}</span>`
+        ).join('');
+
+        col.innerHTML = `
+          <div class="carrier-header">
+            ${carrier.isElephant ? '<div class="carrier-badge">⭐ PREFERRED CARRIER</div>' : ''}
+            ${isLowest ? '<div class="carrier-badge">LOWEST PRICE</div>' : ''}
+            <div class="carrier-name-display">${carrier.name}</div>
+            <div class="carrier-tagline">${carrier.tagline}</div>
+          </div>
+          <div class="carrier-price-section">
+            <div class="price-monthly">$${carrier.monthly}<span>/mo</span></div>
+            <div class="price-sixmo">6-month: <strong>$${carrier.monthly * 6}</strong></div>
+            <div class="price-annual">Annual est: $${carrier.monthly * 12}</div>
+          </div>
+          <div class="carrier-coverages">
+            <div class="coverage-row">
+              <span class="coverage-label">Bodily Injury</span>
+              <span class="coverage-value">${liability}</span>
+            </div>
+            <div class="coverage-row">
+              <span class="coverage-label">Comprehensive</span>
+              <span class="coverage-value">${comp === 'none' ? 'None' : '$' + comp}</span>
+            </div>
+            <div class="coverage-row">
+              <span class="coverage-label">Collision</span>
+              <span class="coverage-value">${coll === 'none' ? 'None' : '$' + coll}</span>
+            </div>
+            <div class="coverage-row">
+              <span class="coverage-label">UM/UIM</span>
+              <span class="coverage-value">${umUim === 'none' ? 'None' : umUim}</span>
+            </div>
+            <div class="coverage-row">
+              <span class="coverage-label">Med Pay</span>
+              <span class="coverage-value">${medPay === 'none' ? 'None' : '$' + parseInt(medPay).toLocaleString()}</span>
+            </div>
+            <div class="coverage-row">
+              <span class="coverage-label">Roadside</span>
+              <span class="coverage-value">${roadside === 'yes' ? '✓ Yes' : 'No'}</span>
+            </div>
+            <div class="coverage-row">
+              <span class="coverage-label">Rental</span>
+              <span class="coverage-value">${rental === 'yes' ? '✓ Yes' : 'No'}</span>
+            </div>
+          </div>
+          <div class="carrier-notes">${noteTags}</div>
+          <div class="carrier-actions">
+            <button class="btn-select-quote" onclick="openModal('${carrier.id}')">
+              View Full Quote Details
+            </button>
+            <a class="btn-launch" href="${carrier.launchUrl}" target="_blank">
+              ${carrier.launchLabel}
+            </a>
+          </div>
+        `;
+        table.appendChild(col);
+      });
+    }
+
+    // ── SORT ──
+    function sortResults(by, btn) {
+      document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (by === 'price') {
+        quoteResults.sort((a, b) => {
+          if (a.isElephant) return -1;
+          if (b.isElephant) return 1;
+          return a.monthly - b.monthly;
+        });
+      } else {
+        quoteResults.sort((a, b) => {
+          if (a.isElephant) return -1;
+          if (b.isElephant) return 1;
+          return a.name.localeCompare(b.name);
+        });
+      }
+      renderResults();
+    }
+
+    // ── MODAL ──
+    function openModal(carrierId) {
+      const carrier = quoteResults.find(c => c.id === carrierId);
+      if (!carrier) return;
+
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const dob = document.getElementById('dob').value;
+      const address = document.getElementById('address').value;
+      const city = document.getElementById('city').value;
+      const state = document.getElementById('state').value;
+      const zip = document.getElementById('zip').value;
+      const vehicleYear = document.getElementById('vehicleYear').value;
+      const vehicleMake = document.getElementById('vehicleMake').value;
+      const vehicleModel = document.getElementById('vehicleModel').value;
+      const vehicleTrim = document.getElementById('vehicleTrim').value;
+      const vehicleOwnership = document.getElementById('vehicleOwnership').value;
+      const vehicleUse = document.getElementById('vehicleUse').value;
+      const liability = document.getElementById('liability').value;
+      const propertyDamage = document.getElementById('propertyDamage').value;
+      const comp = document.getElementById('compDeductible').value;
+      const coll = document.getElementById('collDeductible').value;
+      const umUim = document.getElementById('umUim').value;
+      const medPay = document.getElementById('medPay').value;
+      const roadside = document.getElementById('roadside').value;
+      const rental = document.getElementById('rental').value;
+      const accForgiveness = document.getElementById('accidentForgiveness').value;
+      const newCar = document.getElementById('newCarReplacement').value;
+      const effectiveDate = document.getElementById('effectiveDate').value;
+      const paymentPlan = document.getElementById('paymentPlan').value;
+
+      const noteTags = carrier.notes.map(n =>
+        `<span class="note-tag ${n.type === 'surcharge' ? 'surcharge' : ''}">${n.text}</span>`
+      ).join(' ');
+
+      document.getElementById('modalContent').innerHTML = `
+        <div class="modal-header" style="${carrier.isElephant ? 'background:#003d4d' : ''}">
+          <h3>${carrier.isElephant ? '⭐ ' : ''}${carrier.name} — Quote Summary</h3>
+          <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+
+          <div class="modal-section">
+            <div class="modal-section-title">Price Breakdown</div>
+            <div class="price-breakdown">
+              <div class="price-box">
+                <div class="price-box-label">Monthly</div>
+                <div class="price-box-value">$${carrier.monthly}<span>/mo</span></div>
+              </div>
+              <div class="price-box">
+                <div class="price-box-label">6-Month Premium</div>
+                <div class="price-box-value">$${carrier.monthly * 6}</div>
+              </div>
+              <div class="price-box">
+                <div class="price-box-label">Annual Estimate</div>
+                <div class="price-box-value">$${carrier.monthly * 12}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-section">
+            <div class="modal-section-title">Applicant Information</div>
+            <div class="modal-grid">
+              <div class="modal-row">
+                <div class="modal-row-label">Name</div>
+                <div class="modal-row-value">${firstName} ${lastName}</div>
+              </div>
+              <div class="modal-row">
+                <div class="modal-row-label">Date of Birth</div>
+                <div class="modal-row-value">${dob}</div>
+              </div>
+              <div class="modal-row">
+                <div class="modal-row-label">Address</div>
+                <div class="modal-row-value">${address}, ${city}, ${state} ${zip}</div>
+              </div>
+              <div class="modal-row">
+                <div class="modal-row-label">Payment Plan</div>
+                <div class="modal-row-value">${paymentPlan}</div>
+              </div>
+              ${effectiveDate ? `
+              <div class="modal-row">
+                <div class="modal-row-label">Effective Date</div>
+                <div class="modal-row-value">${effectiveDate}</div>
+              </div>` : ''}
+            </div>
+          </div>
+
+          <div class="modal-section">
+            <div class="modal-section-title">Vehicle</div>
+            <div class="modal-grid">
+              <div class="modal-row">
+                <div class="modal-row-label">Vehicle</div>
+                <div class="modal-row-value">${vehicleYear} ${vehicleMake} ${vehicleModel} ${vehicleTrim}</div>
+              </div>
+              <div class="modal-row">
+                <div class="modal-row-label">Ownership</div>
+                <div class="modal-row-value">${vehicleOwnership}</div>
+              </div>
+              <div class="modal-row">
+                <div class="modal-row-label">Primary Use</div>
+                <div class="modal-row-value">${vehicleUse}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-section">
+            <div class="modal-section-title">Coverage Summary</div>
+            <div class="modal-grid">
+              <div class="modal-row">
+                <div class="modal-row-label">Bodily Injury</div>
+                <div class="modal-row-value">${liability}</div>
+              </div>
+              <div class="modal-row">
+                <div class="modal-row-label">Property Damage</div>
+                <div class="modal-row-value">$${parseInt(propertyDamage).toLocaleString()}</div>
+              </div>
+              <div class="modal-row">
+                <div class="modal-row-label">Comprehensive</div>
+                <div class="modal-row-value">${comp === 'none' ? 'No Coverage' : '$' + comp + ' deductible'}</div>
+              </div>
+              <div class="modal-row">
+                <div class="modal-row-label">Collision</div>
+                <div class="modal-row-value">${coll === 'none' ? 'No Coverage' : '$' + coll + ' deductible'}</div>
+              </div>
+              <div class="modal-row">
+                <div class="modal-row-label">UM/UIM</div>
+                <div class="modal-row-value">${umUim === 'none' ? 'None' : umUim}</div>
+              </div>
+              <div class="modal-row">
+                <div class="modal-row-label">Medical Payments</div>
+                <div class="modal-row-value">${medPay === 'none' ? 'None' : '$' + parseInt(medPay).toLocaleString()}</div>
+              </div>
+              <div class="modal-row">
+                <div class="modal-row-label">Roadside Assistance</div>
+                <div class="modal-row-value">${roadside === 'yes' ? '✓ Included' : 'Not included'}</div>
+              </div>
+              <div class="modal-row">
+                <div class="modal-row-label">Rental Coverage</div>
+                <div class="modal-row-value">${rental === 'yes' ? '✓ Included' : 'Not included'}</div>
+              </div>
+              <div class="modal-row">
+                <div class="modal-row-label">Accident Forgiveness</div>
+                <div class="modal-row-value">${accForgiveness === 'yes' ? '✓ Included' : 'Not included'}</div>
+              </div>
+              <div class="modal-row">
+                <div class="modal-row-label">New Car Replacement</div>
+                <div class="modal-row-value">${newCar === 'yes' ? '✓ Included' : 'Not included'}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-section">
+            <div class="modal-section-title">Underwriting Notes</div>
+            <div class="modal-notes">${noteTags}</div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button class="btn-modal-close" onclick="closeModal()">Close</button>
+          <a class="btn-modal-launch" href="${carrier.launchUrl}" target="_blank">
+            ${carrier.launchLabel}
+          </a>
+        </div>
+      `;
+
+      document.getElementById('col-' + carrierId)?.classList.add('selected');
+      document.getElementById('modalOverlay').classList.add('visible');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('visible');
+    }
+
+    function closeModalOnBackdrop(e) {
+      if (e.target === document.getElementById('modalOverlay')) closeModal();
+    }
+
+  </script>
 </body>
 </html>
