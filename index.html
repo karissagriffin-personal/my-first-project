@@ -371,65 +371,104 @@
     .notepad-actions { display: flex; justify-content: flex-end; margin-top: 8px; gap: 8px; }
 
     /* ═══════════════════════════════════════
-       LOGIN / SETUP SCREENS
+       AUTH SCREEN
     ═══════════════════════════════════════ */
     .auth-screen {
-      display: none;
-      position: fixed; inset: 0;
-      background: #0f172a;
-      z-index: 9000;
-      align-items: center; justify-content: center;
-      flex-direction: column;
+      display: none; position: fixed; inset: 0;
+      background: linear-gradient(135deg, #0f172a 0%, #1a2e44 100%);
+      z-index: 9000; align-items: center; justify-content: center;
     }
     .auth-screen.visible { display: flex; }
 
     .auth-card {
-      background: white;
-      border-radius: 14px;
-      padding: 40px 44px;
-      width: 420px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
-      text-align: center;
+      background: white; border-radius: 16px; width: 440px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.5); overflow: hidden;
     }
-    .auth-logo { font-size: 26px; font-weight: 800; color: #1a2332; margin-bottom: 4px; letter-spacing: -0.5px; }
+    .auth-brand {
+      background: #1a2332; padding: 28px 36px 22px; text-align: center;
+    }
+    .auth-logo { font-size: 28px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
     .auth-logo span { color: #0a9396; }
-    .auth-tagline { font-size: 12px; color: #9ca3af; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 28px; }
-    .auth-heading { font-size: 18px; font-weight: 700; color: #1a2332; margin-bottom: 6px; }
-    .auth-sub { font-size: 13px; color: #6b7280; margin-bottom: 24px; line-height: 1.5; }
+    .auth-tagline { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1.4px; margin-top: 3px; }
 
-    .auth-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; text-align: left; }
+    /* Tab switcher */
+    .auth-tabs { display: flex; border-bottom: 1px solid #e4e7ec; }
+    .auth-tab {
+      flex: 1; padding: 13px; text-align: center; cursor: pointer;
+      font-size: 13px; font-weight: 600; color: #9ca3af;
+      border-bottom: 3px solid transparent; margin-bottom: -1px;
+      transition: all 0.15s;
+    }
+    .auth-tab:hover { color: #374151; }
+    .auth-tab.active { color: #0a9396; border-bottom-color: #0a9396; }
+
+    /* Panels */
+    .auth-panel { display: none; padding: 28px 36px 32px; }
+    .auth-panel.active { display: block; }
+
+    .auth-heading { font-size: 17px; font-weight: 700; color: #1a2332; margin-bottom: 4px; }
+    .auth-sub { font-size: 12px; color: #9ca3af; margin-bottom: 22px; line-height: 1.5; }
+    .auth-welcome-name { color: #0a9396; }
+
+    .auth-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 13px; }
     .auth-field label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #374151; }
     .auth-field input {
-      padding: 10px 14px; border: 1.5px solid #e4e7ec; border-radius: 7px;
-      font-size: 14px; color: #1a2332; background: #f9fafb;
-      transition: border-color 0.2s;
+      padding: 10px 13px; border: 1.5px solid #e4e7ec; border-radius: 7px;
+      font-size: 14px; color: #1a2332; background: #f9fafb; transition: all 0.15s;
     }
-    .auth-field input:focus { outline: none; border-color: #0a9396; background: white; box-shadow: 0 0 0 3px rgba(10,147,150,0.1); }
+    .auth-field input:focus { outline: none; border-color: #0a9396; background: #fff; box-shadow: 0 0 0 3px rgba(10,147,150,0.1); }
     .auth-field input.shake { animation: shake 0.4s; border-color: #ef4444; background: #fef2f2; }
 
     .btn-auth {
       width: 100%; padding: 12px; background: #0a9396; color: white;
       border: none; border-radius: 7px; font-size: 14px; font-weight: 700;
-      cursor: pointer; letter-spacing: 0.3px; margin-top: 6px;
-      transition: background 0.15s;
+      cursor: pointer; margin-top: 4px; transition: background 0.15s; letter-spacing: 0.3px;
     }
     .btn-auth:hover { background: #007f82; }
 
-    .auth-divider { height: 1px; background: #f3f4f6; margin: 20px 0; }
-    .auth-reset { font-size: 12px; color: #9ca3af; cursor: pointer; }
-    .auth-reset:hover { color: #ef4444; text-decoration: underline; }
-    .auth-welcome-name { color: #0a9396; }
-    .auth-error { color: #ef4444; font-size: 12px; margin-top: 8px; display: none; }
+    .auth-links { display: flex; justify-content: space-between; margin-top: 14px; flex-wrap: wrap; gap: 6px; }
+    .auth-link { font-size: 12px; color: #9ca3af; cursor: pointer; }
+    .auth-link:hover { color: #0a9396; text-decoration: underline; }
+    .auth-link.danger:hover { color: #ef4444; }
 
-    .passcode-dots { display: flex; justify-content: center; gap: 10px; margin: 18px 0 10px; }
-    .dot { width: 14px; height: 14px; border-radius: 50%; background: #e4e7ec; transition: background 0.15s; }
+    .auth-error { color: #ef4444; font-size: 12px; margin-top: 10px; display: none; }
+    .auth-info  { color: #0a9396;  font-size: 12px; margin-top: 10px; display: none; background: #f0fdfc; border: 1px solid #99f6e4; border-radius: 6px; padding: 8px 12px; line-height: 1.5; }
+
+    .passcode-dots { display: flex; justify-content: center; gap: 10px; margin: 6px 0 16px; }
+    .dot { width: 13px; height: 13px; border-radius: 50%; background: #e4e7ec; transition: background 0.15s; }
     .dot.filled { background: #0a9396; }
+
+    /* Forgot password inline state */
+    .forgot-panel { display: none; padding: 28px 36px 32px; }
+    .forgot-panel.active { display: block; }
+    .hint-box { background: #f0fdfc; border: 1px solid #99f6e4; border-radius: 8px; padding: 14px 16px; margin: 16px 0; font-size: 13px; color: #065f46; line-height: 1.5; }
+    .hint-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #6b7280; margin-bottom: 4px; }
 
     @keyframes shake {
       0%,100% { transform: translateX(0); }
       20%,60%  { transform: translateX(-6px); }
       40%,80%  { transform: translateX(6px); }
     }
+
+    /* ── Manage Account Page ── */
+    .account-section { margin-bottom: 24px; }
+    .account-section-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: #374151; border-bottom: 1px solid #e4e7ec;
+      padding-bottom: 8px; margin-bottom: 16px;
+    }
+    .account-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .account-field { display: flex; flex-direction: column; gap: 5px; }
+    .account-field label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #374151; }
+    .account-field input {
+      padding: 8px 12px; border: 1px solid #e4e7ec; border-radius: 6px;
+      font-size: 13px; background: #f9fafb;
+    }
+    .account-field input:focus { outline: none; border-color: #0a9396; background: white; }
+    .danger-zone { background: #fff5f5; border: 1px solid #fecaca; border-radius: 8px; padding: 16px 20px; }
+    .danger-zone p { font-size: 13px; color: #6b7280; margin-bottom: 12px; line-height: 1.5; }
+    .btn-danger { background: #ef4444; color: white; border: none; padding: 9px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-danger:hover { background: #dc2626; }
 
     /* Scrollbar */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -454,40 +493,80 @@
 </head>
 <body>
 
-  <!-- ═══ SETUP SCREEN (first time) ═══ -->
-  <div class="auth-screen" id="setupScreen">
+  <!-- ═══ UNIFIED AUTH SCREEN ═══ -->
+  <div class="auth-screen visible" id="authScreen">
     <div class="auth-card">
-      <div class="auth-logo">Agent<span>Desk</span></div>
-      <div class="auth-tagline">Insurance Agent Portal</div>
-      <div class="auth-heading">Welcome! Let's set up your portal.</div>
-      <div class="auth-sub">This only takes a moment. Your info is stored locally on this device.</div>
-      <div class="auth-field"><label>Your First Name</label><input type="text" id="setup-name" placeholder="e.g. Karissa" /></div>
-      <div class="auth-field"><label>Agency Name</label><input type="text" id="setup-agency" placeholder="e.g. Karissa Griffin Insurance" /></div>
-      <div class="auth-field"><label>Create a Passcode <span style="font-weight:400;color:#9ca3af">(4–8 characters)</span></label><input type="password" id="setup-pass" placeholder="Choose a passcode" /></div>
-      <div class="auth-field"><label>Confirm Passcode</label><input type="password" id="setup-pass2" placeholder="Repeat passcode" /></div>
-      <button class="btn-auth" onclick="completeSetup()">Get Started →</button>
-      <div class="auth-error" id="setup-error"></div>
-    </div>
-  </div>
 
-  <!-- ═══ LOGIN SCREEN (returning) ═══ -->
-  <div class="auth-screen" id="loginScreen">
-    <div class="auth-card">
-      <div class="auth-logo">Agent<span>Desk</span></div>
-      <div class="auth-tagline">Insurance Agent Portal</div>
-      <div class="auth-heading">Welcome back, <span class="auth-welcome-name" id="loginName"></span> 👋</div>
-      <div class="auth-sub">Enter your passcode to access your portal.</div>
-      <div class="passcode-dots" id="passcodeDots">
-        <div class="dot" id="dot0"></div>
-        <div class="dot" id="dot1"></div>
-        <div class="dot" id="dot2"></div>
-        <div class="dot" id="dot3"></div>
+      <!-- Branding -->
+      <div class="auth-brand">
+        <div class="auth-logo">Agent<span>Desk</span></div>
+        <div class="auth-tagline">Insurance Agent Portal</div>
       </div>
-      <div class="auth-field"><input type="password" id="login-pass" placeholder="Enter passcode" oninput="updateDots()" onkeydown="if(event.key==='Enter') attemptLogin()" autofocus /></div>
-      <button class="btn-auth" onclick="attemptLogin()">Sign In →</button>
-      <div class="auth-error" id="login-error">Incorrect passcode. Please try again.</div>
-      <div class="auth-divider"></div>
-      <div class="auth-reset" onclick="resetSetup()">Not you, or forgot passcode? Reset setup</div>
+
+      <!-- Tab bar -->
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="authTab-login" onclick="switchAuthTab('login')">Sign In</div>
+        <div class="auth-tab" id="authTab-setup" onclick="switchAuthTab('setup')">Set Up Portal</div>
+      </div>
+
+      <!-- ── LOGIN PANEL ── -->
+      <div class="auth-panel active" id="authPanel-login">
+        <div class="auth-heading">Welcome back 👋</div>
+        <div class="auth-sub">Sign in with your email and passcode.</div>
+        <div class="auth-field">
+          <label>Email Address</label>
+          <input type="email" id="login-email" placeholder="you@agency.com"
+            onkeydown="if(event.key==='Enter') document.getElementById('login-pass').focus()" />
+        </div>
+        <div class="auth-field">
+          <label>Passcode</label>
+          <input type="password" id="login-pass" placeholder="Enter passcode"
+            oninput="updateDots()" onkeydown="if(event.key==='Enter') attemptLogin()" />
+        </div>
+        <div class="passcode-dots">
+          <div class="dot" id="dot0"></div>
+          <div class="dot" id="dot1"></div>
+          <div class="dot" id="dot2"></div>
+          <div class="dot" id="dot3"></div>
+        </div>
+        <button class="btn-auth" onclick="attemptLogin()">Sign In →</button>
+        <div class="auth-error" id="login-error">Incorrect email or passcode. Please try again.</div>
+        <div class="auth-links">
+          <span class="auth-link" onclick="showForgotPanel()">Forgot passcode?</span>
+          <span class="auth-link danger" onclick="switchAuthTab('setup')">Set up a new portal</span>
+        </div>
+      </div>
+
+      <!-- ── FORGOT PASSWORD PANEL ── -->
+      <div class="forgot-panel" id="forgotPanel">
+        <div class="auth-heading">Forgot your passcode?</div>
+        <div class="auth-sub">Here's the hint you set when you created your portal.</div>
+        <div class="hint-box">
+          <div class="hint-label">Your hint</div>
+          <div id="forgotHintText">No hint was set.</div>
+        </div>
+        <button class="btn-auth" onclick="hideForgotPanel()">I remember — Sign In →</button>
+        <div class="auth-links" style="margin-top:14px; justify-content:center;">
+          <span class="auth-link danger" onclick="resetSetup()">Still can't remember? Reset all data</span>
+        </div>
+      </div>
+
+      <!-- ── SETUP PANEL ── -->
+      <div class="auth-panel" id="authPanel-setup">
+        <div class="auth-heading">Set up your portal</div>
+        <div class="auth-sub">Takes 30 seconds. Everything is stored locally on this device — no account needed.</div>
+        <div class="auth-field"><label>Email Address</label><input type="email" id="setup-name" placeholder="e.g. karissa@griffininsurance.com" /></div>
+        <div class="auth-field"><label>Agency Name</label><input type="text" id="setup-agency" placeholder="e.g. Griffin Insurance Agency" /></div>
+        <div class="auth-field"><label>Create Passcode <span style="font-weight:400;color:#9ca3af">(4+ characters)</span></label><input type="password" id="setup-pass" placeholder="Choose a passcode" /></div>
+        <div class="auth-field"><label>Confirm Passcode</label><input type="password" id="setup-pass2" placeholder="Repeat passcode" /></div>
+        <div class="auth-field"><label>Password Hint <span style="font-weight:400;color:#9ca3af">(optional — shown if you forget)</span></label><input type="text" id="setup-hint" placeholder="e.g. My dog's name" /></div>
+        <button class="btn-auth" onclick="completeSetup()">Create My Portal →</button>
+        <div class="auth-error" id="setup-error"></div>
+        <div class="auth-links" style="justify-content:center; margin-top:14px;">
+          <span class="auth-link" onclick="switchAuthTab('login')">← Already set up? Sign in</span>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -517,9 +596,20 @@
       <span class="nav-icon">📚</span> Resources
     </div>
 
-    <div class="sidebar-footer">
-      <strong>Agent Portal</strong>
-      v2.1 — Demo Mode
+    <div class="sidebar-section-label">Account</div>
+    <div class="nav-item" id="nav-account" onclick="showPage('account')">
+      <span class="nav-icon">⚙️</span> Manage Account
+    </div>
+
+    <div class="sidebar-footer" id="sidebarFooter">
+      <strong id="footerName">Agent Portal</strong>
+      <span id="footerAgency">v2.1</span>
+      <div style="margin-top:10px;">
+        <span onclick="logout()" style="cursor:pointer;font-size:11px;color:rgba(255,100,100,0.7);display:flex;align-items:center;gap:5px;transition:color 0.15s;"
+          onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='rgba(255,100,100,0.7)'">
+          🚪 Sign Out
+        </span>
+      </div>
     </div>
   </nav>
 
@@ -1058,6 +1148,62 @@
         </div>
       </div>
 
+      <!-- ══════════════════════════════════
+           MANAGE ACCOUNT PAGE
+      ══════════════════════════════════ -->
+      <div class="page" id="page-account">
+        <div class="page-title">⚙️ Manage Account</div>
+        <div class="page-subtitle">Update your profile, change your passcode, or reset your portal.</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:860px;">
+
+          <!-- Profile -->
+          <div class="card">
+            <div class="card-header"><div class="card-title">👤 Profile</div></div>
+            <div class="card-body">
+              <div class="account-section">
+                <div class="account-grid">
+                  <div class="account-field"><label>Email Address</label><input type="email" id="acct-name" placeholder="you@agency.com" /></div>
+                  <div class="account-field"><label>Agency Name</label><input type="text" id="acct-agency" placeholder="Your agency" /></div>
+                </div>
+                <div style="margin-top:14px;">
+                  <button class="btn-primary" onclick="saveProfile()">Save Profile</button>
+                </div>
+                <div class="auth-error" id="profile-success" style="color:#059669;margin-top:8px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Security -->
+          <div class="card">
+            <div class="card-header"><div class="card-title">🔒 Security</div></div>
+            <div class="card-body">
+              <div class="account-section">
+                <div class="account-field" style="margin-bottom:12px;"><label>Current Passcode</label><input type="password" id="acct-current-pass" placeholder="Enter current passcode" /></div>
+                <div class="account-field" style="margin-bottom:12px;"><label>New Passcode</label><input type="password" id="acct-new-pass" placeholder="New passcode (4+ chars)" /></div>
+                <div class="account-field" style="margin-bottom:12px;"><label>Confirm New Passcode</label><input type="password" id="acct-confirm-pass" placeholder="Repeat new passcode" /></div>
+                <div class="account-field" style="margin-bottom:14px;"><label>Password Hint <span style="font-weight:400;color:#9ca3af">(shown on forgot screen)</span></label><input type="text" id="acct-hint" placeholder="e.g. My dog's name" /></div>
+                <button class="btn-primary" onclick="changePasscode()">Update Passcode</button>
+                <div class="auth-error" id="pass-error" style="display:none;margin-top:8px;"></div>
+                <div class="auth-error" id="pass-success" style="color:#059669;display:none;margin-top:8px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Danger Zone (full width) -->
+          <div class="card" style="grid-column:1/-1;">
+            <div class="card-header"><div class="card-title" style="color:#ef4444;">⚠️ Danger Zone</div></div>
+            <div class="card-body">
+              <div class="danger-zone">
+                <p><strong>Reset all portal data</strong> — This will permanently delete your profile, passcode, all saved clients, quote history, and notepad. You will be taken back to the setup screen. This cannot be undone.</p>
+                <button class="btn-danger" onclick="resetSetup()">Reset Everything</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div><!-- end page-area -->
   </div><!-- end main-area -->
 
@@ -1105,7 +1251,7 @@
     // ════════════════════════════════════
     // PAGE NAVIGATION
     // ════════════════════════════════════
-    const pageLabels = { dashboard: 'Dashboard', rater: 'Auto Rater', clients: 'Client Manager', resources: 'Agent Resources' };
+    const pageLabels = { dashboard: 'Dashboard', rater: 'Auto Rater', clients: 'Client Manager', resources: 'Agent Resources', account: 'Manage Account' };
 
     function showPage(name) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1776,89 +1922,170 @@
     }
 
     // ════════════════════════════════════
-    // AUTH — SETUP & LOGIN
+    // AUTH — SETUP, LOGIN, LOGOUT
     // ════════════════════════════════════
     let sessionAuthenticated = false;
 
     function initAuth() {
       const setupDone = localStorage.getItem('agentdesk_setup');
-      if (!setupDone) {
-        document.getElementById('setupScreen').classList.add('visible');
-        setTimeout(() => document.getElementById('setup-name').focus(), 100);
-      } else {
+      if (setupDone) {
         const profile = JSON.parse(setupDone);
         document.getElementById('loginName').textContent = profile.name;
-        document.getElementById('loginScreen').classList.add('visible');
-        setTimeout(() => document.getElementById('login-pass').focus(), 100);
+        // Default to login tab
+        switchAuthTab('login');
+      } else {
+        // No setup yet — show setup tab by default
+        switchAuthTab('setup');
       }
+      document.getElementById('authScreen').classList.add('visible');
+    }
+
+    function switchAuthTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.auth-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('forgotPanel').classList.remove('active');
+      document.getElementById('authTab-' + tab).classList.add('active');
+      document.getElementById('authPanel-' + tab).classList.add('active');
+      setTimeout(() => {
+        const focus = { login: 'login-email', setup: 'setup-name' };
+        const el = document.getElementById(focus[tab]);
+        if (el) el.focus();
+      }, 50);
     }
 
     function completeSetup() {
-      const name   = document.getElementById('setup-name').value.trim();
+      const email  = document.getElementById('setup-name').value.trim().toLowerCase();
       const agency = document.getElementById('setup-agency').value.trim();
       const pass   = document.getElementById('setup-pass').value;
       const pass2  = document.getElementById('setup-pass2').value;
-      const err    = document.getElementById('setup-error');
-      err.style.display = 'none';
-      if (!name)               { showSetupError('Please enter your name.'); return; }
-      if (!agency)             { showSetupError('Please enter your agency name.'); return; }
-      if (pass.length < 4)     { showSetupError('Passcode must be at least 4 characters.'); return; }
-      if (pass !== pass2)      { showSetupError('Passcodes do not match.'); return; }
-      localStorage.setItem('agentdesk_setup', JSON.stringify({ name, agency, pass }));
-      document.getElementById('setupScreen').classList.remove('visible');
-      applyProfile(name, agency);
+      const hint   = document.getElementById('setup-hint').value.trim();
+      if (!email || !email.includes('@')) { showAuthError('setup-error', 'Please enter a valid email address.'); return; }
+      if (!agency)         { showAuthError('setup-error', 'Please enter your agency name.'); return; }
+      if (pass.length < 4) { showAuthError('setup-error', 'Passcode must be at least 4 characters.'); return; }
+      if (pass !== pass2)  { showAuthError('setup-error', 'Passcodes do not match.'); return; }
+      localStorage.setItem('agentdesk_setup', JSON.stringify({ name: email, agency, pass, hint }));
+      document.getElementById('authScreen').classList.remove('visible');
+      applyProfile(email, agency);
       sessionAuthenticated = true;
     }
 
-    function showSetupError(msg) {
-      const err = document.getElementById('setup-error');
-      err.textContent = msg;
-      err.style.display = 'block';
+    function showAuthError(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg; el.style.display = 'block';
     }
 
     function attemptLogin() {
-      const profile = JSON.parse(localStorage.getItem('agentdesk_setup') || '{}');
-      const entered = document.getElementById('login-pass').value;
-      const errEl   = document.getElementById('login-error');
-      if (entered === profile.pass) {
-        document.getElementById('loginScreen').classList.remove('visible');
+      const raw = localStorage.getItem('agentdesk_setup');
+      if (!raw) { switchAuthTab('setup'); return; }
+      const profile  = JSON.parse(raw);
+      const entEmail = document.getElementById('login-email').value.trim().toLowerCase();
+      const entPass  = document.getElementById('login-pass').value;
+      const emailOk  = entEmail === profile.name.toLowerCase();
+      const passOk   = entPass  === profile.pass;
+      if (emailOk && passOk) {
+        document.getElementById('authScreen').classList.remove('visible');
         applyProfile(profile.name, profile.agency);
         sessionAuthenticated = true;
-        errEl.style.display = 'none';
+        document.getElementById('login-error').style.display = 'none';
       } else {
-        errEl.style.display = 'block';
-        const input = document.getElementById('login-pass');
-        input.classList.add('shake');
-        input.value = '';
-        updateDots();
-        setTimeout(() => input.classList.remove('shake'), 400);
-        input.focus();
+        document.getElementById('login-error').style.display = 'block';
+        const passEl = document.getElementById('login-pass');
+        passEl.classList.add('shake');
+        passEl.value = ''; updateDots();
+        setTimeout(() => passEl.classList.remove('shake'), 400);
+        passEl.focus();
       }
     }
 
-    function applyProfile(name, agency) {
-      // Personalize greeting and sidebar
+    function logout() {
+      if (!confirm('Sign out of AgentDesk?')) return;
+      sessionAuthenticated = false;
+      document.getElementById('login-email').value = '';
+      document.getElementById('login-pass').value = '';
+      updateDots();
+      document.getElementById('login-error').style.display = 'none';
+      switchAuthTab('login');
+      document.getElementById('authScreen').classList.add('visible');
+      setTimeout(() => document.getElementById('login-pass').focus(), 100);
+    }
+
+    function applyProfile(email, agency) {
+      // Derive a friendly display name from the email prefix
+      const displayName = email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
       document.querySelector('.logo-sub').textContent = agency;
-      document.querySelector('.sidebar-footer').innerHTML =
-        `<strong>${name}</strong>${agency}<br><span style="font-size:10px;opacity:0.5;">v2.1 — Agent Portal</span>`;
-      // Greet on dashboard
+      document.getElementById('footerName').textContent = email;
+      document.getElementById('footerAgency').textContent = agency;
       const hour = new Date().getHours();
       const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-      document.querySelector('#page-dashboard .page-title').textContent = `${greeting}, ${name} 👋`;
+      document.querySelector('#page-dashboard .page-title').textContent = `${greeting}, ${displayName} 👋`;
+      // Prefill account fields
+      document.getElementById('acct-name').value   = email;
+      document.getElementById('acct-agency').value = agency;
+      const profile = JSON.parse(localStorage.getItem('agentdesk_setup') || '{}');
+      document.getElementById('acct-hint').value   = profile.hint || '';
     }
 
     function updateDots() {
       const len = document.getElementById('login-pass').value.length;
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 4; i++)
         document.getElementById('dot'+i).classList.toggle('filled', i < len);
-      }
+    }
+
+    function showForgotPanel() {
+      const profile = JSON.parse(localStorage.getItem('agentdesk_setup') || '{}');
+      document.getElementById('forgotHintText').textContent = profile.hint || 'No hint was set during setup.';
+      document.querySelectorAll('.auth-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('forgotPanel').classList.add('active');
+    }
+
+    function hideForgotPanel() {
+      document.getElementById('forgotPanel').classList.remove('active');
+      document.getElementById('authPanel-login').classList.add('active');
+      setTimeout(() => document.getElementById('login-pass').focus(), 50);
     }
 
     function resetSetup() {
-      if (confirm('This will clear your name, agency, passcode, and all saved clients. Are you sure?')) {
+      if (confirm('⚠️ This will delete EVERYTHING — profile, passcode, all clients, history, and notes. This cannot be undone. Are you sure?')) {
         localStorage.clear();
         location.reload();
       }
+    }
+
+    // ════════════════════════════════════
+    // MANAGE ACCOUNT
+    // ════════════════════════════════════
+    function saveProfile() {
+      const name   = document.getElementById('acct-name').value.trim();
+      const agency = document.getElementById('acct-agency').value.trim();
+      if (!name || !agency) { showAuthError('profile-success', 'Name and agency are required.'); return; }
+      const profile = JSON.parse(localStorage.getItem('agentdesk_setup') || '{}');
+      profile.name = name; profile.agency = agency;
+      localStorage.setItem('agentdesk_setup', JSON.stringify(profile));
+      applyProfile(name, agency);
+      const el = document.getElementById('profile-success');
+      el.textContent = '✓ Profile saved!'; el.style.display = 'block';
+      setTimeout(() => { el.style.display = 'none'; }, 3000);
+    }
+
+    function changePasscode() {
+      const profile  = JSON.parse(localStorage.getItem('agentdesk_setup') || '{}');
+      const current  = document.getElementById('acct-current-pass').value;
+      const newPass  = document.getElementById('acct-new-pass').value;
+      const confirm  = document.getElementById('acct-confirm-pass').value;
+      const hint     = document.getElementById('acct-hint').value.trim();
+      const errEl    = document.getElementById('pass-error');
+      const okEl     = document.getElementById('pass-success');
+      errEl.style.display = 'none'; okEl.style.display = 'none';
+      if (current !== profile.pass) { errEl.textContent = 'Current passcode is incorrect.'; errEl.style.display = 'block'; return; }
+      if (newPass.length < 4)       { errEl.textContent = 'New passcode must be at least 4 characters.'; errEl.style.display = 'block'; return; }
+      if (newPass !== confirm)       { errEl.textContent = 'New passcodes do not match.'; errEl.style.display = 'block'; return; }
+      profile.pass = newPass; profile.hint = hint;
+      localStorage.setItem('agentdesk_setup', JSON.stringify(profile));
+      document.getElementById('acct-current-pass').value = '';
+      document.getElementById('acct-new-pass').value = '';
+      document.getElementById('acct-confirm-pass').value = '';
+      okEl.textContent = '✓ Passcode updated!'; okEl.style.display = 'block';
+      setTimeout(() => { okEl.style.display = 'none'; }, 3000);
     }
 
     // ════════════════════════════════════
