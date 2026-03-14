@@ -2,945 +2,1035 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Agency Rater</title>
+  <title>AgentDesk — Insurance Agent Portal</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1a2332; font-size: 13px; display: flex; height: 100vh; overflow: hidden; }
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #eef2f5;
-      color: #222;
-      font-size: 13px;
+    /* ═══════════════════════════════════════
+       SIDEBAR
+    ═══════════════════════════════════════ */
+    .sidebar {
+      width: 230px; min-width: 230px;
+      background: #1a2332;
+      display: flex; flex-direction: column;
+      height: 100vh; overflow-y: auto;
+      z-index: 200;
     }
+    .sidebar-logo {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-logo .logo-mark {
+      font-size: 18px; font-weight: 800; letter-spacing: -0.5px;
+      color: #fff;
+    }
+    .sidebar-logo .logo-mark span { color: #0a9396; }
+    .sidebar-logo .logo-sub {
+      font-size: 10px; color: rgba(255,255,255,0.4);
+      text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;
+    }
+    .sidebar-section-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+      text-transform: uppercase; color: rgba(255,255,255,0.3);
+      padding: 16px 18px 6px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 18px;
+      cursor: pointer;
+      color: rgba(255,255,255,0.6);
+      font-size: 13px; font-weight: 500;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+      text-decoration: none;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .nav-item.active { background: rgba(10,147,150,0.15); color: #fff; border-left-color: #0a9396; }
+    .nav-item .nav-icon { font-size: 15px; width: 20px; text-align: center; }
+    .nav-item .nav-badge {
+      margin-left: auto;
+      background: #0a9396; color: white;
+      font-size: 10px; font-weight: bold;
+      padding: 1px 6px; border-radius: 20px;
+    }
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 14px 18px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 11px; color: rgba(255,255,255,0.35);
+    }
+    .sidebar-footer strong { color: rgba(255,255,255,0.6); display: block; font-size: 12px; margin-bottom: 2px; }
 
-    /* ── TOP BAR ── */
-    header {
-      background: #003d4d;
-      color: white;
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
+    /* ═══════════════════════════════════════
+       MAIN AREA
+    ═══════════════════════════════════════ */
+    .main-area {
+      flex: 1; display: flex; flex-direction: column; overflow: hidden;
+    }
+    .top-bar {
+      background: white;
+      border-bottom: 1px solid #e4e7ec;
+      padding: 0 24px;
+      height: 52px; min-height: 52px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
       z-index: 100;
     }
-    header h1 { font-size: 18px; letter-spacing: 1px; }
-    header span { font-size: 12px; opacity: 0.7; }
+    .breadcrumb { font-size: 13px; color: #6b7280; }
+    .breadcrumb strong { color: #1a2332; }
+    .top-bar-actions { display: flex; align-items: center; gap: 10px; }
+    .top-bar-date { font-size: 12px; color: #9ca3af; }
+    .btn-new-quote {
+      background: #0a9396; color: white;
+      border: none; padding: 7px 14px; border-radius: 5px;
+      font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.3px;
+    }
+    .btn-new-quote:hover { background: #007f82; }
 
-    /* ── PAGE LAYOUT ── */
-    .page { padding: 16px; max-width: 1400px; margin: 0 auto; }
+    .page-area { flex: 1; overflow-y: auto; padding: 24px; }
 
-    /* ── FORM PANEL ── */
+    /* ═══════════════════════════════════════
+       PAGE SECTIONS
+    ═══════════════════════════════════════ */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .page-title {
+      font-size: 20px; font-weight: 700; color: #1a2332;
+      margin-bottom: 4px;
+    }
+    .page-subtitle { font-size: 13px; color: #6b7280; margin-bottom: 20px; }
+
+    /* ═══════════════════════════════════════
+       CARDS & STATS
+    ═══════════════════════════════════════ */
+    .card {
+      background: white; border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      border: 1px solid #e4e7ec;
+    }
+    .card-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid #f3f4f6;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-title { font-size: 13px; font-weight: 700; color: #1a2332; }
+    .card-body { padding: 18px; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+    .stat-card {
+      background: white; border-radius: 8px;
+      border: 1px solid #e4e7ec;
+      padding: 16px 18px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: #9ca3af; font-weight: 600; margin-bottom: 6px; }
+    .stat-value { font-size: 28px; font-weight: 800; color: #1a2332; line-height: 1; }
+    .stat-value.teal { color: #0a9396; }
+    .stat-sub { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+
+    .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .dash-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+    /* Quick Actions */
+    .quick-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .qa-btn {
+      display: flex; align-items: center; gap: 8px;
+      background: #f8f9fa; border: 1px solid #e4e7ec;
+      padding: 10px 16px; border-radius: 6px;
+      cursor: pointer; font-size: 13px; font-weight: 500; color: #374151;
+      transition: all 0.15s;
+    }
+    .qa-btn:hover { background: #eef7f7; border-color: #0a9396; color: #0a9396; }
+    .qa-btn .qa-icon { font-size: 16px; }
+
+    /* Tables */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th {
+      background: #f8f9fa; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.7px;
+      color: #6b7280; padding: 10px 14px;
+      border-bottom: 1px solid #e4e7ec; text-align: left;
+    }
+    .data-table td {
+      padding: 10px 14px; border-bottom: 1px solid #f3f4f6;
+      font-size: 13px; color: #374151;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: #fafbfc; }
+    .data-table .empty-row td { text-align: center; color: #9ca3af; padding: 24px; font-style: italic; }
+
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 20px;
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-blue  { background: #dbeafe; color: #1e40af; }
+    .badge-yellow { background: #fef9c3; color: #854d0e; }
+    .badge-red   { background: #fee2e2; color: #991b1b; }
+    .badge-gray  { background: #f3f4f6; color: #4b5563; }
+    .badge-teal  { background: #ccfbf1; color: #065f46; }
+
+    /* ═══════════════════════════════════════
+       AUTO RATER (existing styles)
+    ═══════════════════════════════════════ */
     .form-panel {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      margin-bottom: 16px;
-      overflow: hidden;
+      background: white; border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      border: 1px solid #e4e7ec;
+      margin-bottom: 16px; overflow: hidden;
     }
-
-    /* ── TABS ── */
-    .tabs {
-      display: flex;
-      border-bottom: 2px solid #e0e0e0;
-      background: #f7f9fb;
-    }
+    .tabs { display: flex; border-bottom: 2px solid #e0e0e0; background: #f7f9fb; }
     .tab {
-      padding: 10px 24px;
-      cursor: pointer;
-      font-weight: bold;
-      color: #666;
-      border-bottom: 3px solid transparent;
-      margin-bottom: -2px;
-      transition: all 0.2s;
-      font-size: 13px;
+      padding: 10px 22px; cursor: pointer; font-weight: 700;
+      color: #666; border-bottom: 3px solid transparent;
+      margin-bottom: -2px; transition: all 0.2s; font-size: 13px;
     }
     .tab:hover { color: #003d4d; }
-    .tab.active {
-      color: #003d4d;
-      border-bottom-color: #003d4d;
-      background: white;
-    }
+    .tab.active { color: #003d4d; border-bottom-color: #003d4d; background: white; }
     .tab.has-error { color: #e63946; }
     .tab.has-error.active { border-bottom-color: #e63946; }
-
-    /* ── TAB CONTENT ── */
     .tab-content { padding: 20px; }
     .tab-pane { display: none; }
     .tab-pane.active { display: block; }
-
     .section-title {
-      font-size: 11px;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #003d4d;
-      border-bottom: 1px solid #e0e7ea;
-      padding-bottom: 6px;
-      margin-bottom: 14px;
-      margin-top: 20px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: #003d4d;
+      border-bottom: 1px solid #e0e7ea; padding-bottom: 6px;
+      margin-bottom: 14px; margin-top: 20px;
     }
     .section-title:first-child { margin-top: 0; }
-
-    /* ── GRIDS ── */
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; }
     .grid.three { grid-template-columns: 1fr 1fr 1fr; }
     .grid.four { grid-template-columns: 1fr 1fr 1fr 1fr; }
-
     .field { display: flex; flex-direction: column; gap: 4px; }
-    .field label {
-      font-size: 11px;
-      font-weight: bold;
-      color: #555;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .field label { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
     .field input, .field select {
-      padding: 7px 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 13px;
-      color: #222;
-      background: #fff;
+      padding: 7px 10px; border: 1px solid #ccc; border-radius: 4px;
+      font-size: 13px; color: #222; background: #fff;
     }
-    .field input:focus, .field select:focus {
-      outline: none;
-      border-color: #0a9396;
-      box-shadow: 0 0 0 2px rgba(10,147,150,0.15);
-    }
-    .field input.error, .field select.error {
-      border-color: #e63946;
-      background: #fff5f5;
-    }
-    .error-msg {
-      color: #e63946;
-      font-size: 11px;
-      margin-top: 2px;
-    }
+    .field input:focus, .field select:focus { outline: none; border-color: #0a9396; box-shadow: 0 0 0 2px rgba(10,147,150,0.15); }
+    .field input.error, .field select.error { border-color: #e63946; background: #fff5f5; }
+    .error-msg { color: #e63946; font-size: 11px; margin-top: 2px; }
     .validation-banner {
-      background: #fff0f0;
-      border: 1px solid #e63946;
-      color: #c1121f;
-      padding: 10px 16px;
-      border-radius: 5px;
-      margin-bottom: 14px;
-      font-size: 13px;
-      display: none;
-      line-height: 1.6;
+      background: #fff0f0; border: 1px solid #e63946; color: #c1121f;
+      padding: 10px 16px; border-radius: 5px; margin-bottom: 14px;
+      font-size: 13px; display: none; line-height: 1.6;
     }
-
-    /* ── FOOTER BAR ── */
     .footer-bar {
-      padding: 12px 20px;
-      border-top: 1px solid #e0e0e0;
-      background: #f7f9fb;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      padding: 12px 20px; border-top: 1px solid #e0e0e0;
+      background: #f7f9fb; display: flex; align-items: center; justify-content: space-between;
     }
-    .btn-run {
-      background: #003d4d;
-      color: white;
-      border: none;
-      padding: 10px 36px;
-      border-radius: 5px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      letter-spacing: 0.5px;
-    }
+    .btn-run { background: #003d4d; color: white; border: none; padding: 10px 36px; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; letter-spacing: 0.5px; }
     .btn-run:hover { background: #005f73; }
-    .btn-clear {
-      background: none;
-      border: 1px solid #ccc;
-      padding: 10px 20px;
-      border-radius: 5px;
-      font-size: 13px;
-      cursor: pointer;
-      color: #666;
-    }
+    .btn-clear { background: none; border: 1px solid #ccc; padding: 10px 20px; border-radius: 5px; font-size: 13px; cursor: pointer; color: #666; }
     .btn-clear:hover { background: #f0f0f0; }
-    .btn-dev {
-      background: none;
-      border: 1px dashed #aaa;
-      padding: 10px 16px;
-      border-radius: 5px;
-      font-size: 13px;
-      cursor: pointer;
-      color: #888;
-    }
+    .btn-dev { background: none; border: 1px dashed #aaa; padding: 10px 16px; border-radius: 5px; font-size: 13px; cursor: pointer; color: #888; }
     .btn-dev:hover { background: #f5f0ff; border-color: #9b5de5; color: #9b5de5; }
+    .btn-save-client { background: none; border: 1px solid #0a9396; padding: 10px 16px; border-radius: 5px; font-size: 13px; cursor: pointer; color: #0a9396; font-weight: 600; }
+    .btn-save-client:hover { background: #eef7f7; }
 
-    /* ── RESULTS PANEL ── */
-    .results-panel {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      overflow: hidden;
-      display: none;
-    }
+    /* Results */
+    .results-panel { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border: 1px solid #e4e7ec; overflow: hidden; display: none; }
     .results-panel.visible { display: block; }
-
-    .results-header {
-      background: #003d4d;
-      color: white;
-      padding: 12px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .results-header { background: #003d4d; color: white; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
     .results-header h2 { font-size: 14px; letter-spacing: 0.5px; }
     .results-meta { font-size: 12px; opacity: 0.8; }
-
-    /* ── SORT BAR ── */
-    .sort-bar {
-      padding: 10px 20px;
-      background: #f7f9fb;
-      border-bottom: 1px solid #e0e0e0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 12px;
-      color: #666;
-    }
-    .sort-btn {
-      padding: 4px 12px;
-      border: 1px solid #ccc;
-      border-radius: 20px;
-      background: white;
-      cursor: pointer;
-      font-size: 12px;
-      color: #333;
-    }
-    .sort-btn.active {
-      background: #003d4d;
-      color: white;
-      border-color: #003d4d;
-    }
-
-    /* ── CARRIER COMPARISON TABLE ── */
-    .comparison-wrapper {
-      overflow-x: auto;
-      padding: 20px;
-    }
-    .comparison-table {
-      display: flex;
-      gap: 16px;
-      min-width: max-content;
-    }
-
-    /* ── CARRIER COLUMN ── */
-    .carrier-col {
-      width: 240px;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      overflow: hidden;
-      transition: box-shadow 0.2s;
-      flex-shrink: 0;
-    }
+    .sort-bar { padding: 10px 20px; background: #f7f9fb; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; gap: 10px; font-size: 12px; color: #666; }
+    .sort-btn { padding: 4px 12px; border: 1px solid #ccc; border-radius: 20px; background: white; cursor: pointer; font-size: 12px; color: #333; }
+    .sort-btn.active { background: #003d4d; color: white; border-color: #003d4d; }
+    .comparison-wrapper { overflow-x: auto; padding: 20px; }
+    .comparison-table { display: flex; gap: 16px; min-width: max-content; }
+    .carrier-col { width: 240px; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; transition: box-shadow 0.2s; flex-shrink: 0; }
     .carrier-col:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-    .carrier-col.selected {
-      border-color: #0a9396;
-      box-shadow: 0 0 0 2px #0a9396;
-    }
-
-    /* Elephant featured column */
-    .carrier-col.elephant {
-      width: 260px;
-      border-color: #003d4d;
-      border-width: 2px;
-    }
-
-    .carrier-header {
-      padding: 14px;
-      background: #f7f9fb;
-      border-bottom: 1px solid #e0e0e0;
-      text-align: center;
-    }
-    .carrier-col.elephant .carrier-header {
-      background: #003d4d;
-      color: white;
-    }
-
-    .carrier-badge {
-      display: inline-block;
-      background: #0a9396;
-      color: white;
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-weight: bold;
-      margin-bottom: 6px;
-      letter-spacing: 0.5px;
-    }
-    .carrier-col.elephant .carrier-badge {
-      background: white;
-      color: #003d4d;
-    }
-
-    .carrier-name-display {
-      font-weight: bold;
-      font-size: 15px;
-      margin-bottom: 2px;
-    }
+    .carrier-col.selected { border-color: #0a9396; box-shadow: 0 0 0 2px #0a9396; }
+    .carrier-col.elephant { width: 260px; border-color: #003d4d; border-width: 2px; }
+    .carrier-header { padding: 14px; background: #f7f9fb; border-bottom: 1px solid #e0e0e0; text-align: center; }
+    .carrier-col.elephant .carrier-header { background: #003d4d; color: white; }
+    .carrier-badge { display: inline-block; background: #0a9396; color: white; font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: bold; margin-bottom: 6px; letter-spacing: 0.5px; }
+    .carrier-col.elephant .carrier-badge { background: white; color: #003d4d; }
+    .carrier-name-display { font-weight: bold; font-size: 15px; margin-bottom: 2px; }
     .carrier-col.elephant .carrier-name-display { color: white; }
-
-    .carrier-tagline {
-      font-size: 11px;
-      color: #888;
-    }
+    .carrier-tagline { font-size: 11px; color: #888; }
     .carrier-col.elephant .carrier-tagline { color: rgba(255,255,255,0.7); }
-
-    /* Price section */
-    .carrier-price-section {
-      padding: 16px 14px;
-      text-align: center;
-      border-bottom: 1px solid #e0e0e0;
-      background: white;
-    }
-    .price-monthly {
-      font-size: 32px;
-      font-weight: bold;
-      color: #003d4d;
-      line-height: 1;
-    }
+    .carrier-price-section { padding: 16px 14px; text-align: center; border-bottom: 1px solid #e0e0e0; background: white; }
+    .price-monthly { font-size: 32px; font-weight: bold; color: #003d4d; line-height: 1; }
     .price-monthly span { font-size: 14px; font-weight: normal; color: #888; }
-    .price-sixmo {
-      font-size: 12px;
-      color: #666;
-      margin-top: 4px;
-    }
-    .price-annual {
-      font-size: 11px;
-      color: #aaa;
-      margin-top: 2px;
-    }
-
-    /* Coverage rows */
-    .carrier-coverages {
-      padding: 12px 14px;
-      border-bottom: 1px solid #e0e0e0;
-    }
-    .coverage-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      padding: 3px 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
+    .price-sixmo { font-size: 12px; color: #666; margin-top: 4px; }
+    .price-annual { font-size: 11px; color: #aaa; margin-top: 2px; }
+    .carrier-coverages { padding: 12px 14px; border-bottom: 1px solid #e0e0e0; }
+    .coverage-row { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; border-bottom: 1px solid #f0f0f0; }
     .coverage-row:last-child { border-bottom: none; }
     .coverage-label { color: #888; }
     .coverage-value { font-weight: bold; color: #333; }
-
-    /* Notes */
-    .carrier-notes {
-      padding: 10px 14px;
-      background: #fffbf0;
-      border-bottom: 1px solid #e0e0e0;
-      font-size: 11px;
-      color: #888;
-      min-height: 36px;
-    }
-    .note-tag {
-      display: inline-block;
-      background: #e8f4f8;
-      color: #005f73;
-      padding: 2px 6px;
-      border-radius: 3px;
-      margin: 2px 2px 2px 0;
-      font-size: 10px;
-    }
-    .note-tag.surcharge {
-      background: #fff0f0;
-      color: #c1121f;
-    }
-
-    /* Actions */
-    .carrier-actions {
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .btn-select-quote {
-      width: 100%;
-      padding: 9px;
-      background: #003d4d;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 13px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    .carrier-notes { padding: 10px 14px; background: #fffbf0; border-bottom: 1px solid #e0e0e0; font-size: 11px; color: #888; min-height: 36px; }
+    .note-tag { display: inline-block; background: #e8f4f8; color: #005f73; padding: 2px 6px; border-radius: 3px; margin: 2px 2px 2px 0; font-size: 10px; }
+    .note-tag.surcharge { background: #fff0f0; color: #c1121f; }
+    .carrier-actions { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .btn-select-quote { width: 100%; padding: 9px; background: #003d4d; color: white; border: none; border-radius: 5px; font-size: 13px; font-weight: bold; cursor: pointer; }
     .btn-select-quote:hover { background: #005f73; }
-    .carrier-col.elephant .btn-select-quote {
-      background: #0a9396;
-    }
+    .carrier-col.elephant .btn-select-quote { background: #0a9396; }
     .carrier-col.elephant .btn-select-quote:hover { background: #007f82; }
-
-    .btn-launch {
-      width: 100%;
-      padding: 8px;
-      background: white;
-      color: #003d4d;
-      border: 1px solid #003d4d;
-      border-radius: 5px;
-      font-size: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      display: block;
-    }
+    .btn-launch { width: 100%; padding: 8px; background: white; color: #003d4d; border: 1px solid #003d4d; border-radius: 5px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; display: block; }
     .btn-launch:hover { background: #eef2f5; }
 
-    /* ── MODAL OVERLAY ── */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-    }
+    /* Modal */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
     .modal-overlay.visible { display: flex; }
-
-    .modal {
-      background: white;
-      border-radius: 10px;
-      width: 620px;
-      max-height: 85vh;
-      overflow-y: auto;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.2);
-    }
-
-    .modal-header {
-      background: #003d4d;
-      color: white;
-      padding: 16px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-    }
+    .modal { background: white; border-radius: 10px; width: 620px; max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.2); }
+    .modal-header { background: #003d4d; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; }
     .modal-header h3 { font-size: 16px; }
-    .modal-close {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 22px;
-      cursor: pointer;
-      line-height: 1;
-      opacity: 0.8;
-    }
+    .modal-close { background: none; border: none; color: white; font-size: 22px; cursor: pointer; line-height: 1; opacity: 0.8; }
     .modal-close:hover { opacity: 1; }
-
     .modal-body { padding: 20px; }
-
     .modal-section { margin-bottom: 20px; }
-    .modal-section-title {
-      font-size: 11px;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #003d4d;
-      border-bottom: 1px solid #e0e7ea;
-      padding-bottom: 6px;
-      margin-bottom: 12px;
-    }
-
-    .modal-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px 20px;
-      font-size: 13px;
-    }
+    .modal-section-title { font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #003d4d; border-bottom: 1px solid #e0e7ea; padding-bottom: 6px; margin-bottom: 12px; }
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; font-size: 13px; }
     .modal-row { display: flex; flex-direction: column; gap: 2px; }
     .modal-row-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
     .modal-row-value { font-weight: bold; color: #222; }
-
-    .price-breakdown {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-      text-align: center;
-    }
-    .price-box {
-      background: #f7f9fb;
-      border-radius: 6px;
-      padding: 12px;
-    }
+    .price-breakdown { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; text-align: center; }
+    .price-box { background: #f7f9fb; border-radius: 6px; padding: 12px; }
     .price-box-label { font-size: 11px; color: #888; margin-bottom: 4px; }
     .price-box-value { font-size: 22px; font-weight: bold; color: #003d4d; }
     .price-box-value span { font-size: 12px; font-weight: normal; color: #888; }
-
-    .modal-notes {
-      background: #fffbf0;
-      border: 1px solid #ffe57f;
-      border-radius: 5px;
-      padding: 12px;
-      font-size: 12px;
-      color: #666;
-      line-height: 1.8;
-    }
-
-    .modal-footer {
-      padding: 16px 20px;
-      border-top: 1px solid #e0e0e0;
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      background: #f7f9fb;
-      position: sticky;
-      bottom: 0;
-    }
-    .btn-modal-close {
-      padding: 10px 20px;
-      background: none;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 13px;
-      color: #666;
-    }
-    .btn-modal-launch {
-      padding: 10px 24px;
-      background: #003d4d;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: bold;
-      text-decoration: none;
-      display: inline-block;
-    }
+    .modal-notes { background: #fffbf0; border: 1px solid #ffe57f; border-radius: 5px; padding: 12px; font-size: 12px; color: #666; line-height: 1.8; }
+    .modal-footer { padding: 16px 20px; border-top: 1px solid #e0e0e0; display: flex; gap: 10px; justify-content: flex-end; background: #f7f9fb; position: sticky; bottom: 0; }
+    .btn-modal-close { padding: 10px 20px; background: none; border: 1px solid #ccc; border-radius: 5px; cursor: pointer; font-size: 13px; color: #666; }
+    .btn-modal-launch { padding: 10px 24px; background: #003d4d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block; }
     .btn-modal-launch:hover { background: #005f73; }
+
+    /* ═══════════════════════════════════════
+       CLIENTS PAGE
+    ═══════════════════════════════════════ */
+    .search-bar-row { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; }
+    .search-input {
+      flex: 1; padding: 8px 12px; border: 1px solid #e4e7ec; border-radius: 6px;
+      font-size: 13px; background: white;
+    }
+    .search-input:focus { outline: none; border-color: #0a9396; box-shadow: 0 0 0 2px rgba(10,147,150,0.1); }
+    .btn-primary { background: #0a9396; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-primary:hover { background: #007f82; }
+    .btn-secondary { background: white; color: #374151; border: 1px solid #e4e7ec; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; }
+    .btn-secondary:hover { background: #f9fafb; }
+    .btn-sm { padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; border: none; font-weight: 600; }
+    .btn-sm-teal { background: #ccfbf1; color: #065f46; }
+    .btn-sm-teal:hover { background: #99f6e4; }
+    .btn-sm-gray { background: #f3f4f6; color: #374151; }
+    .btn-sm-gray:hover { background: #e5e7eb; }
+    .btn-sm-red { background: #fee2e2; color: #991b1b; }
+    .btn-sm-red:hover { background: #fecaca; }
+
+    /* Client form modal */
+    .client-modal-body .field { margin-bottom: 12px; }
+    .client-modal-body .field label { display: block; margin-bottom: 4px; font-size: 12px; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.5px; }
+    .client-modal-body .field input, .client-modal-body .field select { width: 100%; padding: 8px 10px; border: 1px solid #e4e7ec; border-radius: 5px; font-size: 13px; }
+
+    /* ═══════════════════════════════════════
+       RESOURCES PAGE
+    ═══════════════════════════════════════ */
+    .resources-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .carrier-resource-card {
+      background: white; border: 1px solid #e4e7ec; border-radius: 8px;
+      padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .carrier-resource-card:hover { border-color: #0a9396; }
+    .cr-header { display: flex; align-items: center; justify-content: space-between; }
+    .cr-name { font-weight: 700; font-size: 14px; color: #1a2332; }
+    .cr-body { font-size: 12px; color: #6b7280; line-height: 1.6; }
+    .cr-info { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 12px; }
+    .cr-info-label { color: #9ca3af; font-weight: 600; }
+    .cr-info-value { color: #374151; }
+    .cr-link { font-size: 12px; color: #0a9396; text-decoration: none; font-weight: 600; }
+    .cr-link:hover { text-decoration: underline; }
+    .cr-appetite { margin-top: 4px; display: flex; gap: 4px; flex-wrap: wrap; }
+
+    .links-list { display: flex; flex-direction: column; gap: 8px; }
+    .link-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; background: #f8f9fa; border: 1px solid #e4e7ec;
+      border-radius: 6px;
+    }
+    .link-item-left { display: flex; flex-direction: column; gap: 2px; }
+    .link-item-name { font-weight: 600; font-size: 13px; color: #1a2332; }
+    .link-item-desc { font-size: 11px; color: #9ca3af; }
+    .link-item a { font-size: 12px; color: #0a9396; text-decoration: none; font-weight: 600; white-space: nowrap; }
+    .link-item a:hover { text-decoration: underline; }
+
+    .accordion-item { border: 1px solid #e4e7ec; border-radius: 6px; margin-bottom: 8px; overflow: hidden; }
+    .accordion-trigger { padding: 12px 16px; cursor: pointer; font-weight: 600; font-size: 13px; background: #f8f9fa; display: flex; justify-content: space-between; align-items: center; }
+    .accordion-trigger:hover { background: #f0f2f5; }
+    .accordion-body { padding: 14px 16px; font-size: 13px; color: #374151; line-height: 1.7; display: none; border-top: 1px solid #e4e7ec; }
+    .accordion-body.open { display: block; }
+    .accordion-arrow { transition: transform 0.2s; }
+    .accordion-arrow.open { transform: rotate(180deg); }
+
+    .notepad { width: 100%; height: 180px; border: 1px solid #e4e7ec; border-radius: 6px; padding: 12px; font-size: 13px; font-family: inherit; resize: vertical; color: #374151; background: #fffef5; }
+    .notepad:focus { outline: none; border-color: #0a9396; }
+    .notepad-actions { display: flex; justify-content: flex-end; margin-top: 8px; gap: 8px; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #f0f2f5; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+
+    /* ═══════════════════════════════════════
+       SAVE QUOTE TOAST
+    ═══════════════════════════════════════ */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: #1a2332; color: white;
+      padding: 12px 18px; border-radius: 8px;
+      font-size: 13px; font-weight: 500;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s; z-index: 9999;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast .toast-icon { margin-right: 8px; }
   </style>
 </head>
 <body>
 
-  <!-- TOP BAR -->
-  <header>
-    <h1>🏢 Agency Rater</h1>
-    <span>Agent Desktop Tool — v2.0</span>
-  </header>
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">Agent<span>Desk</span></div>
+      <div class="logo-sub">Insurance Agent Portal</div>
+    </div>
 
-  <div class="page">
+    <div class="sidebar-section-label">Main</div>
+    <div class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">
+      <span class="nav-icon">🏠</span> Dashboard
+    </div>
+    <div class="nav-item" id="nav-rater" onclick="showPage('rater')">
+      <span class="nav-icon">⚡</span> Auto Rater
+    </div>
 
-    <!-- FORM PANEL -->
-    <div class="form-panel">
-      <div class="tabs">
-        <div class="tab active" id="tab-btn-applicant" onclick="switchTab('applicant')">Applicant</div>
-        <div class="tab" id="tab-btn-vehicle" onclick="switchTab('vehicle')">Vehicle</div>
-        <div class="tab" id="tab-btn-drivers" onclick="switchTab('drivers')">Drivers</div>
-        <div class="tab" id="tab-btn-coverage" onclick="switchTab('coverage')">Coverage</div>
-      </div>
+    <div class="sidebar-section-label">Management</div>
+    <div class="nav-item" id="nav-clients" onclick="showPage('clients')">
+      <span class="nav-icon">👥</span> Clients
+      <span class="nav-badge" id="clientCountBadge">0</span>
+    </div>
 
-      <div class="tab-content">
+    <div class="sidebar-section-label">Tools</div>
+    <div class="nav-item" id="nav-resources" onclick="showPage('resources')">
+      <span class="nav-icon">📚</span> Resources
+    </div>
 
-        <!-- APPLICANT TAB -->
-        <div class="tab-pane active" id="tab-applicant">
-          <div class="section-title">Personal Information</div>
-          <div class="grid three">
-            <div class="field">
-              <label>First Name</label>
-              <input type="text" id="firstName" />
-            </div>
-            <div class="field">
-              <label>Last Name</label>
-              <input type="text" id="lastName" />
-            </div>
-            <div class="field">
-              <label>Suffix</label>
-              <select id="suffix">
-                <option value="">None</option>
-                <option>Jr.</option><option>Sr.</option>
-                <option>II</option><option>III</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Date of Birth</label>
-              <input type="date" id="dob" />
-            </div>
-            <div class="field">
-              <label>Gender</label>
-              <select id="gender">
-                <option value="">Select</option>
-                <option>Male</option><option>Female</option><option>Non-binary</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Marital Status</label>
-              <select id="maritalStatus">
-                <option value="">Select</option>
-                <option>Single</option><option>Married</option>
-                <option>Divorced</option><option>Widowed</option>
-              </select>
-            </div>
-          </div>
+    <div class="sidebar-footer">
+      <strong>Agent Portal</strong>
+      v2.1 — Demo Mode
+    </div>
+  </nav>
 
-          <div class="section-title">Address</div>
-          <div class="grid four">
-            <div class="field">
-              <label>Street Address</label>
-              <input type="text" id="address" />
-            </div>
-            <div class="field">
-              <label>City</label>
-              <input type="text" id="city" />
-            </div>
-            <div class="field">
-              <label>State</label>
-              <select id="state">
-                <option value="">Select</option>
-                <option>VA</option><option>TX</option><option>TN</option>
-                <option>IN</option><option>IL</option><option>OH</option><option>GA</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>ZIP Code</label>
-              <input type="text" id="zip" maxlength="5" />
-            </div>
-            <div class="field">
-              <label>Apt / Unit</label>
-              <input type="text" id="apt" placeholder="Optional" />
-            </div>
-            <div class="field">
-              <label>Residence Type</label>
-              <select id="homeType">
-                <option value="">Select</option>
-                <option>Own Home</option><option>Rent</option>
-                <option>Own Condo</option><option>Own Mobile Home</option>
-                <option>Live with Parents</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="section-title">Contact</div>
-          <div class="grid">
-            <div class="field">
-              <label>Email</label>
-              <input type="email" id="email" />
-            </div>
-            <div class="field">
-              <label>Phone</label>
-              <input type="tel" id="phone" />
-            </div>
-          </div>
-        </div>
-
-        <!-- VEHICLE TAB -->
-        <div class="tab-pane" id="tab-vehicle">
-          <div class="section-title">Vehicle Information</div>
-          <div class="grid four">
-            <div class="field">
-              <label>Year</label>
-              <input type="number" id="vehicleYear" min="1981" max="2026" />
-            </div>
-            <div class="field">
-              <label>Make</label>
-              <input type="text" id="vehicleMake" />
-            </div>
-            <div class="field">
-              <label>Model</label>
-              <input type="text" id="vehicleModel" />
-            </div>
-            <div class="field">
-              <label>Trim</label>
-              <input type="text" id="vehicleTrim" placeholder="Optional" />
-            </div>
-            <div class="field">
-              <label>VIN</label>
-              <input type="text" id="vin" placeholder="Optional" />
-            </div>
-            <div class="field">
-              <label>Ownership</label>
-              <select id="vehicleOwnership">
-                <option value="">Select</option>
-                <option>Owned</option><option>Financed</option><option>Leased</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="section-title">Usage</div>
-          <div class="grid four">
-            <div class="field">
-              <label>Primary Use</label>
-              <select id="vehicleUse">
-                <option value="">Select</option>
-                <option>Commute</option><option>Pleasure</option>
-                <option>Business</option><option>Farm</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Annual Mileage</label>
-              <select id="annualMileage">
-                <option value="">Select</option>
-                <option value="5000">Under 5,000</option>
-                <option value="7500">5,000 – 7,500</option>
-                <option value="10000">7,500 – 10,000</option>
-                <option value="12500">10,000 – 12,500</option>
-                <option value="15000">12,500 – 15,000</option>
-                <option value="20000">15,000 – 20,000</option>
-                <option value="25000">Over 20,000</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Anti-Theft Device</label>
-              <select id="antiTheft">
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Garaging ZIP</label>
-              <select id="garagingZipSelect" onchange="handleGaragingZip()">
-                <option value="">Select</option>
-                <option id="garagingZipSame" value="same">Same as Applicant ZIP</option>
-                <option value="other">Other — Enter Manually</option>
-              </select>
-              <input type="text" id="garagingZipManual" maxlength="5"
-                placeholder="Enter ZIP" style="display:none; margin-top:6px;" />
-            </div>
-          </div>
-        </div>
-
-        <!-- DRIVERS TAB -->
-        <div class="tab-pane" id="tab-drivers">
-          <div class="section-title">Primary Driver</div>
-          <div class="grid four">
-            <div class="field">
-              <label>License State</label>
-              <select id="licenseState">
-                <option value="">Select</option>
-                <option>VA</option><option>TX</option><option>TN</option>
-                <option>IN</option><option>IL</option><option>OH</option><option>GA</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Age First Licensed</label>
-              <input type="number" id="ageLicensed" min="14" max="99" />
-            </div>
-            <div class="field">
-              <label>Violations (last 5 yrs)</label>
-              <select id="violations">
-                <option value="none">None</option>
-                <option value="ticket">Speeding Ticket</option>
-                <option value="accident">At-Fault Accident</option>
-                <option value="dui">DUI / DWI</option>
-                <option value="multiple">Multiple Incidents</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>SR-22 Required?</label>
-              <select id="sr22">
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Good Student Discount?</label>
-              <select id="goodStudent">
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Defensive Driver Course?</label>
-              <select id="defensiveDriving">
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="section-title">Current Insurance</div>
-          <div class="grid four">
-            <div class="field">
-              <label>Currently Insured?</label>
-              <select id="currentlyInsured">
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Current Carrier</label>
-              <input type="text" id="currentCarrier" placeholder="e.g. Elephant Insurance" />
-            </div>
-            <div class="field">
-              <label>Years with Carrier</label>
-              <select id="yearsInsured">
-                <option value="">Select</option>
-                <option value="less1">Less than 1 yr</option>
-                <option value="1-2">1 – 2 yrs</option>
-                <option value="3-5">3 – 5 yrs</option>
-                <option value="6+">6+ yrs</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Reason for Shopping</label>
-              <select id="shoppingReason">
-                <option value="">Select</option>
-                <option>Price</option><option>Coverage</option>
-                <option>New Vehicle</option><option>Life Change</option><option>Renewal</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- COVERAGE TAB -->
-        <div class="tab-pane" id="tab-coverage">
-          <div class="section-title">Liability</div>
-          <div class="grid four">
-            <div class="field">
-              <label>Bodily Injury Limits</label>
-              <select id="liability">
-                <option value="25/50">25/50 — State Minimum</option>
-                <option value="50/100">50/100</option>
-                <option value="100/300" selected>100/300 — Recommended</option>
-                <option value="250/500">250/500</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Property Damage</label>
-              <select id="propertyDamage">
-                <option value="25000">$25,000</option>
-                <option value="50000" selected>$50,000</option>
-                <option value="100000">$100,000</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Uninsured Motorist</label>
-              <select id="umUim">
-                <option value="none">None</option>
-                <option value="25/50">25/50</option>
-                <option value="50/100" selected>50/100</option>
-                <option value="100/300">100/300</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Medical Payments</label>
-              <select id="medPay">
-                <option value="none">None</option>
-                <option value="1000">$1,000</option>
-                <option value="2000">$2,000</option>
-                <option value="5000">$5,000</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="section-title">Physical Damage</div>
-          <div class="grid four">
-            <div class="field">
-              <label>Comprehensive Deductible</label>
-              <select id="compDeductible">
-                <option value="none">No Coverage</option>
-                <option value="250">$250</option>
-                <option value="500" selected>$500</option>
-                <option value="1000">$1,000</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Collision Deductible</label>
-              <select id="collDeductible">
-                <option value="none">No Coverage</option>
-                <option value="250">$250</option>
-                <option value="500" selected>$500</option>
-                <option value="1000">$1,000</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="section-title">Add-ons</div>
-          <div class="grid four">
-            <div class="field">
-              <label>Roadside Assistance</label>
-              <select id="roadside">
-                <option value="no">No</option>
-                <option value="yes">Yes (+$5/mo)</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Rental Car Coverage</label>
-              <select id="rental">
-                <option value="no">No</option>
-                <option value="yes">Yes (+$4/mo)</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Accident Forgiveness</label>
-              <select id="accidentForgiveness">
-                <option value="no">No</option>
-                <option value="yes">Yes (+$8/mo)</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>New Car Replacement</label>
-              <select id="newCarReplacement">
-                <option value="no">No</option>
-                <option value="yes">Yes (+$10/mo)</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="section-title">Effective Date &amp; Payment</div>
-          <div class="grid">
-            <div class="field">
-              <label>Requested Effective Date</label>
-              <input type="date" id="effectiveDate" />
-            </div>
-            <div class="field">
-              <label>Payment Plan</label>
-              <select id="paymentPlan">
-                <option value="monthly">Monthly</option>
-                <option value="paid-in-full">Paid in Full (5% discount)</option>
-                <option value="semi-annual">Semi-Annual</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- end tab-content -->
-
-      <div class="footer-bar">
-        <button class="btn-clear" onclick="clearForm()">Clear Form</button>
-        <button class="btn-dev" onclick="devFill()" title="Auto-fill with test data">🧪 Dev Fill</button>
-        <button class="btn-run" onclick="runQuotes()">⚡ Run Quotes</button>
-      </div>
-    </div><!-- end form-panel -->
-
-    <!-- RESULTS PANEL -->
-    <div class="results-panel" id="resultsPanel">
-      <div class="results-header">
-        <h2>📋 Quote Results</h2>
-        <div class="results-meta" id="resultsMeta"></div>
-      </div>
-      <div class="sort-bar">
-        Sort by:
-        <button class="sort-btn active" onclick="sortResults('price', this)">Price ↑</button>
-        <button class="sort-btn" onclick="sortResults('carrier', this)">Carrier Name</button>
-      </div>
-      <div class="comparison-wrapper">
-        <div class="comparison-table" id="comparisonTable"></div>
+  <!-- ═══ MAIN AREA ═══ -->
+  <div class="main-area">
+    <div class="top-bar">
+      <div class="breadcrumb" id="breadcrumb"><strong>Dashboard</strong></div>
+      <div class="top-bar-actions">
+        <span class="top-bar-date" id="todayDate"></span>
+        <button class="btn-new-quote" onclick="showPage('rater')">⚡ New Quote</button>
       </div>
     </div>
 
-  </div><!-- end page -->
+    <div class="page-area">
 
-  <!-- QUOTE DETAIL MODAL -->
+      <!-- ══════════════════════════════════
+           DASHBOARD PAGE
+      ══════════════════════════════════ -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-title">Good morning, Agent 👋</div>
+        <div class="page-subtitle">Here's your activity summary for today.</div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Quotes Run</div>
+            <div class="stat-value teal" id="stat-quotes">0</div>
+            <div class="stat-sub">This session</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Clients Saved</div>
+            <div class="stat-value" id="stat-clients">0</div>
+            <div class="stat-sub">In your book</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Carriers Active</div>
+            <div class="stat-value">6</div>
+            <div class="stat-sub">Auto markets</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Preferred Carrier</div>
+            <div class="stat-value" style="font-size:16px;margin-top:4px;">🐘 Elephant</div>
+            <div class="stat-sub">Featured first</div>
+          </div>
+        </div>
+
+        <div class="dash-grid">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">⚡ Quick Actions</div>
+            </div>
+            <div class="card-body">
+              <div class="quick-actions">
+                <div class="qa-btn" onclick="showPage('rater'); devFill();">
+                  <span class="qa-icon">🧪</span> Run Test Quote
+                </div>
+                <div class="qa-btn" onclick="showPage('rater')">
+                  <span class="qa-icon">📋</span> New Quote
+                </div>
+                <div class="qa-btn" onclick="showPage('clients'); openNewClientModal()">
+                  <span class="qa-icon">➕</span> Add Client
+                </div>
+                <div class="qa-btn" onclick="showPage('resources')">
+                  <span class="qa-icon">📚</span> Resources
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📡 Carrier Status</div>
+            </div>
+            <div class="card-body" style="padding:10px 18px;">
+              <table class="data-table">
+                <thead><tr><th>Carrier</th><th>Type</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>🐘 Elephant Insurance</td><td><span class="badge badge-teal">Preferred</span></td><td><span class="badge badge-green">Active</span></td></tr>
+                  <tr><td>Bristol West</td><td><span class="badge badge-yellow">Non-Standard</span></td><td><span class="badge badge-green">Active</span></td></tr>
+                  <tr><td>Progressive</td><td><span class="badge badge-blue">Standard</span></td><td><span class="badge badge-green">Active</span></td></tr>
+                  <tr><td>Dairyland Auto</td><td><span class="badge badge-yellow">SR-22 Specialist</span></td><td><span class="badge badge-green">Active</span></td></tr>
+                  <tr><td>Lemonade Auto</td><td><span class="badge badge-blue">InsurTech</span></td><td><span class="badge badge-green">Active</span></td></tr>
+                  <tr><td>Safeco</td><td><span class="badge badge-blue">Standard</span></td><td><span class="badge badge-green">Active</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🕒 Recent Quote History</div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data-table" id="dashQuoteTable">
+              <thead><tr><th>Name</th><th>Vehicle</th><th>State</th><th>Coverage</th><th>Lowest Rate</th><th>Time</th></tr></thead>
+              <tbody id="dashQuoteBody">
+                <tr class="empty-row"><td colspan="6">No quotes run yet this session. Hit ⚡ New Quote to get started.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ══════════════════════════════════
+           AUTO RATER PAGE
+      ══════════════════════════════════ -->
+      <div class="page" id="page-rater">
+        <div class="page-title">⚡ Auto Rater</div>
+        <div class="page-subtitle">Enter applicant information across all tabs, then run quotes.</div>
+
+        <div class="form-panel">
+          <div class="tabs">
+            <div class="tab active" id="tab-btn-applicant" onclick="switchTab('applicant')">Applicant</div>
+            <div class="tab" id="tab-btn-vehicle" onclick="switchTab('vehicle')">Vehicle</div>
+            <div class="tab" id="tab-btn-drivers" onclick="switchTab('drivers')">Drivers</div>
+            <div class="tab" id="tab-btn-coverage" onclick="switchTab('coverage')">Coverage</div>
+          </div>
+
+          <div class="tab-content">
+            <!-- APPLICANT -->
+            <div class="tab-pane active" id="tab-applicant">
+              <div class="section-title">Personal Information</div>
+              <div class="grid three">
+                <div class="field"><label>First Name</label><input type="text" id="firstName" /></div>
+                <div class="field"><label>Last Name</label><input type="text" id="lastName" /></div>
+                <div class="field"><label>Suffix</label>
+                  <select id="suffix"><option value="">None</option><option>Jr.</option><option>Sr.</option><option>II</option><option>III</option></select>
+                </div>
+                <div class="field"><label>Date of Birth</label><input type="date" id="dob" /></div>
+                <div class="field"><label>Gender</label>
+                  <select id="gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Non-binary</option></select>
+                </div>
+                <div class="field"><label>Marital Status</label>
+                  <select id="maritalStatus"><option value="">Select</option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select>
+                </div>
+              </div>
+              <div class="section-title">Address</div>
+              <div class="grid four">
+                <div class="field"><label>Street Address</label><input type="text" id="address" /></div>
+                <div class="field"><label>City</label><input type="text" id="city" /></div>
+                <div class="field"><label>State</label>
+                  <select id="state"><option value="">Select</option><option>VA</option><option>TX</option><option>TN</option><option>IN</option><option>IL</option><option>OH</option><option>GA</option></select>
+                </div>
+                <div class="field"><label>ZIP Code</label><input type="text" id="zip" maxlength="5" /></div>
+                <div class="field"><label>Apt / Unit</label><input type="text" id="apt" placeholder="Optional" /></div>
+                <div class="field"><label>Residence Type</label>
+                  <select id="homeType"><option value="">Select</option><option>Own Home</option><option>Rent</option><option>Own Condo</option><option>Own Mobile Home</option><option>Live with Parents</option></select>
+                </div>
+              </div>
+              <div class="section-title">Contact</div>
+              <div class="grid">
+                <div class="field"><label>Email</label><input type="email" id="email" /></div>
+                <div class="field"><label>Phone</label><input type="tel" id="phone" /></div>
+              </div>
+            </div>
+
+            <!-- VEHICLE -->
+            <div class="tab-pane" id="tab-vehicle">
+              <div class="section-title">Vehicle Information</div>
+              <div class="grid four">
+                <div class="field"><label>Year</label><input type="number" id="vehicleYear" min="1981" max="2026" /></div>
+                <div class="field"><label>Make</label><input type="text" id="vehicleMake" /></div>
+                <div class="field"><label>Model</label><input type="text" id="vehicleModel" /></div>
+                <div class="field"><label>Trim</label><input type="text" id="vehicleTrim" placeholder="Optional" /></div>
+                <div class="field"><label>VIN</label><input type="text" id="vin" placeholder="Optional" /></div>
+                <div class="field"><label>Ownership</label>
+                  <select id="vehicleOwnership"><option value="">Select</option><option>Owned</option><option>Financed</option><option>Leased</option></select>
+                </div>
+              </div>
+              <div class="section-title">Usage</div>
+              <div class="grid four">
+                <div class="field"><label>Primary Use</label>
+                  <select id="vehicleUse"><option value="">Select</option><option>Commute</option><option>Pleasure</option><option>Business</option><option>Farm</option></select>
+                </div>
+                <div class="field"><label>Annual Mileage</label>
+                  <select id="annualMileage"><option value="">Select</option><option value="5000">Under 5,000</option><option value="7500">5,000–7,500</option><option value="10000">7,500–10,000</option><option value="12500">10,000–12,500</option><option value="15000">12,500–15,000</option><option value="20000">15,000–20,000</option><option value="25000">Over 20,000</option></select>
+                </div>
+                <div class="field"><label>Anti-Theft Device</label>
+                  <select id="antiTheft"><option value="no">No</option><option value="yes">Yes</option></select>
+                </div>
+                <div class="field"><label>Garaging ZIP</label>
+                  <select id="garagingZipSelect" onchange="handleGaragingZip()">
+                    <option value="">Select</option>
+                    <option id="garagingZipSame" value="same">Same as Applicant ZIP</option>
+                    <option value="other">Other — Enter Manually</option>
+                  </select>
+                  <input type="text" id="garagingZipManual" maxlength="5" placeholder="Enter ZIP" style="display:none;margin-top:6px;" />
+                </div>
+              </div>
+            </div>
+
+            <!-- DRIVERS -->
+            <div class="tab-pane" id="tab-drivers">
+              <div class="section-title">Primary Driver</div>
+              <div class="grid four">
+                <div class="field"><label>License State</label>
+                  <select id="licenseState"><option value="">Select</option><option>VA</option><option>TX</option><option>TN</option><option>IN</option><option>IL</option><option>OH</option><option>GA</option></select>
+                </div>
+                <div class="field"><label>Age First Licensed</label><input type="number" id="ageLicensed" min="14" max="99" /></div>
+                <div class="field"><label>Violations (last 5 yrs)</label>
+                  <select id="violations"><option value="none">None</option><option value="ticket">Speeding Ticket</option><option value="accident">At-Fault Accident</option><option value="dui">DUI / DWI</option><option value="multiple">Multiple Incidents</option></select>
+                </div>
+                <div class="field"><label>SR-22 Required?</label>
+                  <select id="sr22"><option value="no">No</option><option value="yes">Yes</option></select>
+                </div>
+                <div class="field"><label>Good Student Discount?</label>
+                  <select id="goodStudent"><option value="no">No</option><option value="yes">Yes</option></select>
+                </div>
+                <div class="field"><label>Defensive Driver Course?</label>
+                  <select id="defensiveDriving"><option value="no">No</option><option value="yes">Yes</option></select>
+                </div>
+              </div>
+              <div class="section-title">Current Insurance</div>
+              <div class="grid four">
+                <div class="field"><label>Currently Insured?</label>
+                  <select id="currentlyInsured"><option value="yes">Yes</option><option value="no">No</option></select>
+                </div>
+                <div class="field"><label>Current Carrier</label><input type="text" id="currentCarrier" placeholder="e.g. Elephant Insurance" /></div>
+                <div class="field"><label>Years with Carrier</label>
+                  <select id="yearsInsured"><option value="">Select</option><option value="less1">Less than 1 yr</option><option value="1-2">1–2 yrs</option><option value="3-5">3–5 yrs</option><option value="6+">6+ yrs</option></select>
+                </div>
+                <div class="field"><label>Reason for Shopping</label>
+                  <select id="shoppingReason"><option value="">Select</option><option>Price</option><option>Coverage</option><option>New Vehicle</option><option>Life Change</option><option>Renewal</option></select>
+                </div>
+              </div>
+            </div>
+
+            <!-- COVERAGE -->
+            <div class="tab-pane" id="tab-coverage">
+              <div class="section-title">Liability</div>
+              <div class="grid four">
+                <div class="field"><label>Bodily Injury Limits</label>
+                  <select id="liability"><option value="25/50">25/50 — State Minimum</option><option value="50/100">50/100</option><option value="100/300" selected>100/300 — Recommended</option><option value="250/500">250/500</option></select>
+                </div>
+                <div class="field"><label>Property Damage</label>
+                  <select id="propertyDamage"><option value="25000">$25,000</option><option value="50000" selected>$50,000</option><option value="100000">$100,000</option></select>
+                </div>
+                <div class="field"><label>Uninsured Motorist</label>
+                  <select id="umUim"><option value="none">None</option><option value="25/50">25/50</option><option value="50/100" selected>50/100</option><option value="100/300">100/300</option></select>
+                </div>
+                <div class="field"><label>Medical Payments</label>
+                  <select id="medPay"><option value="none">None</option><option value="1000">$1,000</option><option value="2000">$2,000</option><option value="5000">$5,000</option></select>
+                </div>
+              </div>
+              <div class="section-title">Physical Damage</div>
+              <div class="grid four">
+                <div class="field"><label>Comprehensive Deductible</label>
+                  <select id="compDeductible"><option value="none">No Coverage</option><option value="250">$250</option><option value="500" selected>$500</option><option value="1000">$1,000</option></select>
+                </div>
+                <div class="field"><label>Collision Deductible</label>
+                  <select id="collDeductible"><option value="none">No Coverage</option><option value="250">$250</option><option value="500" selected>$500</option><option value="1000">$1,000</option></select>
+                </div>
+              </div>
+              <div class="section-title">Add-ons</div>
+              <div class="grid four">
+                <div class="field"><label>Roadside Assistance</label><select id="roadside"><option value="no">No</option><option value="yes">Yes (+$5/mo)</option></select></div>
+                <div class="field"><label>Rental Car Coverage</label><select id="rental"><option value="no">No</option><option value="yes">Yes (+$4/mo)</option></select></div>
+                <div class="field"><label>Accident Forgiveness</label><select id="accidentForgiveness"><option value="no">No</option><option value="yes">Yes (+$8/mo)</option></select></div>
+                <div class="field"><label>New Car Replacement</label><select id="newCarReplacement"><option value="no">No</option><option value="yes">Yes (+$10/mo)</option></select></div>
+              </div>
+              <div class="section-title">Effective Date &amp; Payment</div>
+              <div class="grid">
+                <div class="field"><label>Requested Effective Date</label><input type="date" id="effectiveDate" /></div>
+                <div class="field"><label>Payment Plan</label>
+                  <select id="paymentPlan"><option value="monthly">Monthly</option><option value="paid-in-full">Paid in Full (5% discount)</option><option value="semi-annual">Semi-Annual</option></select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer-bar">
+            <button class="btn-clear" onclick="clearForm()">Clear Form</button>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-dev" onclick="devFill()" title="Auto-fill with test data">🧪 Dev Fill</button>
+              <button class="btn-save-client" onclick="saveCurrentApplicantAsClient()" title="Save applicant as client">💾 Save Client</button>
+            </div>
+            <button class="btn-run" onclick="runQuotes()">⚡ Run Quotes</button>
+          </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div class="results-panel" id="resultsPanel">
+          <div class="results-header">
+            <h2>📋 Quote Results</h2>
+            <div class="results-meta" id="resultsMeta"></div>
+          </div>
+          <div class="sort-bar">
+            Sort by:
+            <button class="sort-btn active" onclick="sortResults('price', this)">Price ↑</button>
+            <button class="sort-btn" onclick="sortResults('carrier', this)">Carrier Name</button>
+            <div style="margin-left:auto; display:flex; gap:8px;">
+              <button class="btn-save-client" style="font-size:11px;padding:5px 12px;" onclick="saveQuoteToHistory()">💾 Save to History</button>
+            </div>
+          </div>
+          <div class="comparison-wrapper">
+            <div class="comparison-table" id="comparisonTable"></div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ══════════════════════════════════
+           CLIENTS PAGE
+      ══════════════════════════════════ -->
+      <div class="page" id="page-clients">
+        <div class="page-title">👥 Client Manager</div>
+        <div class="page-subtitle">Save and manage your book of business. Client data is stored in your browser.</div>
+
+        <div class="search-bar-row">
+          <input class="search-input" type="text" id="clientSearch" placeholder="Search by name, state, or carrier..." oninput="renderClientTable()" />
+          <button class="btn-primary" onclick="openNewClientModal()">➕ Add Client</button>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="padding:0;">
+            <table class="data-table" id="clientTable">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>DOB</th>
+                  <th>State</th>
+                  <th>Last Vehicle</th>
+                  <th>Last Carrier</th>
+                  <th>Last Quoted</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="clientTableBody">
+                <tr class="empty-row"><td colspan="7">No clients yet. Add a client or save one from the rater.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ══════════════════════════════════
+           RESOURCES PAGE
+      ══════════════════════════════════ -->
+      <div class="page" id="page-resources">
+        <div class="page-title">📚 Agent Resources</div>
+        <div class="page-subtitle">Carrier directory, tools, underwriting tips, and your notepad.</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+          <!-- LEFT COLUMN -->
+          <div>
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-header"><div class="card-title">🏢 Carrier Directory</div></div>
+              <div class="card-body" style="padding:14px;display:flex;flex-direction:column;gap:12px;">
+
+                <div class="carrier-resource-card">
+                  <div class="cr-header"><div class="cr-name">🐘 Elephant Insurance</div><span class="badge badge-teal">Preferred</span></div>
+                  <div class="cr-info">
+                    <span class="cr-info-label">Phone</span><span class="cr-info-value">1-855-ELEPHANT (353-7428)</span>
+                    <span class="cr-info-label">Agent Site</span><span class="cr-info-value"><a class="cr-link" href="https://agents.elephant.com" target="_blank">agents.elephant.com</a></span>
+                    <span class="cr-info-label">States</span><span class="cr-info-value">VA, TX, TN, IN, IL, OH, GA</span>
+                  </div>
+                  <div class="cr-appetite">
+                    <span class="badge badge-green">Preferred Risks</span>
+                    <span class="badge badge-blue">Homeowners Discount</span>
+                    <span class="badge badge-blue">Multi-Policy</span>
+                  </div>
+                </div>
+
+                <div class="carrier-resource-card">
+                  <div class="cr-header"><div class="cr-name">Bristol West</div><span class="badge badge-yellow">Non-Standard</span></div>
+                  <div class="cr-info">
+                    <span class="cr-info-label">Phone</span><span class="cr-info-value">1-888-888-0080</span>
+                    <span class="cr-info-label">Agent Site</span><span class="cr-info-value"><a class="cr-link" href="https://www.bristolwest.com" target="_blank">bristolwest.com</a></span>
+                    <span class="cr-info-label">Appetite</span><span class="cr-info-value">Non-standard, prior lapses OK</span>
+                  </div>
+                  <div class="cr-appetite">
+                    <span class="badge badge-yellow">Prior Lapses</span>
+                    <span class="badge badge-yellow">Violations OK</span>
+                  </div>
+                </div>
+
+                <div class="carrier-resource-card">
+                  <div class="cr-header"><div class="cr-name">Progressive</div><span class="badge badge-blue">Standard</span></div>
+                  <div class="cr-info">
+                    <span class="cr-info-label">Phone</span><span class="cr-info-value">1-800-776-4737</span>
+                    <span class="cr-info-label">Agent Site</span><span class="cr-info-value"><a class="cr-link" href="https://www.progressive.com/agent/" target="_blank">progressive.com/agent</a></span>
+                    <span class="cr-info-label">Notes</span><span class="cr-info-value">Snapshot telematics available</span>
+                  </div>
+                  <div class="cr-appetite">
+                    <span class="badge badge-blue">Snapshot Program</span>
+                    <span class="badge badge-blue">Name Your Price</span>
+                  </div>
+                </div>
+
+                <div class="carrier-resource-card">
+                  <div class="cr-header"><div class="cr-name">Dairyland Auto</div><span class="badge badge-yellow">SR-22 Specialist</span></div>
+                  <div class="cr-info">
+                    <span class="cr-info-label">Phone</span><span class="cr-info-value">1-800-334-0090</span>
+                    <span class="cr-info-label">Agent Site</span><span class="cr-info-value"><a class="cr-link" href="https://www.dairyland.com" target="_blank">dairyland.com</a></span>
+                    <span class="cr-info-label">Specialty</span><span class="cr-info-value">SR-22 filings, high-risk drivers</span>
+                  </div>
+                  <div class="cr-appetite">
+                    <span class="badge badge-yellow">SR-22 Filing</span>
+                    <span class="badge badge-yellow">DUI/DWI OK</span>
+                    <span class="badge badge-yellow">High Risk</span>
+                  </div>
+                </div>
+
+                <div class="carrier-resource-card">
+                  <div class="cr-header"><div class="cr-name">Lemonade Auto</div><span class="badge badge-blue">InsurTech</span></div>
+                  <div class="cr-info">
+                    <span class="cr-info-label">Phone</span><span class="cr-info-value">App/Chat only</span>
+                    <span class="cr-info-label">Site</span><span class="cr-info-value"><a class="cr-link" href="https://www.lemonade.com/car/" target="_blank">lemonade.com/car</a></span>
+                    <span class="cr-info-label">Notes</span><span class="cr-info-value">AI-powered, flat fee model</span>
+                  </div>
+                  <div class="cr-appetite">
+                    <span class="badge badge-blue">Clean Records</span>
+                    <span class="badge badge-blue">Young Drivers</span>
+                  </div>
+                </div>
+
+                <div class="carrier-resource-card">
+                  <div class="cr-header"><div class="cr-name">Safeco</div><span class="badge badge-blue">Standard</span></div>
+                  <div class="cr-info">
+                    <span class="cr-info-label">Phone</span><span class="cr-info-value">1-800-332-3226</span>
+                    <span class="cr-info-label">Agent Site</span><span class="cr-info-value"><a class="cr-link" href="https://www.safeco.com" target="_blank">safeco.com</a></span>
+                    <span class="cr-info-label">Notes</span><span class="cr-info-value">Liberty Mutual company, RightTrack</span>
+                  </div>
+                  <div class="cr-appetite">
+                    <span class="badge badge-blue">RightTrack Telematics</span>
+                    <span class="badge badge-blue">Multi-Policy</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN -->
+          <div>
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-header"><div class="card-title">🔗 Agent Quick Links</div></div>
+              <div class="card-body" style="padding:14px;">
+                <div class="links-list">
+                  <div class="link-item">
+                    <div class="link-item-left">
+                      <div class="link-item-name">For Agents Only</div>
+                      <div class="link-item-desc">Agent community, resources & tools</div>
+                    </div>
+                    <a href="https://www.foragentsonly.com" target="_blank">Visit →</a>
+                  </div>
+                  <div class="link-item">
+                    <div class="link-item-left">
+                      <div class="link-item-name">CLUE Report (LexisNexis)</div>
+                      <div class="link-item-desc">Comprehensive Loss Underwriting Exchange</div>
+                    </div>
+                    <a href="https://personalreports.lexisnexis.com" target="_blank">Visit →</a>
+                  </div>
+                  <div class="link-item">
+                    <div class="link-item-left">
+                      <div class="link-item-name">NICB VINCheck</div>
+                      <div class="link-item-desc">Free VIN theft & salvage check</div>
+                    </div>
+                    <a href="https://www.nicb.org/vincheck" target="_blank">Visit →</a>
+                  </div>
+                  <div class="link-item">
+                    <div class="link-item-left">
+                      <div class="link-item-name">NAIC State Rate Filings</div>
+                      <div class="link-item-desc">State insurance department rate info</div>
+                    </div>
+                    <a href="https://content.naic.org" target="_blank">Visit →</a>
+                  </div>
+                  <div class="link-item">
+                    <div class="link-item-left">
+                      <div class="link-item-name">Kelley Blue Book</div>
+                      <div class="link-item-desc">Vehicle valuation for coverage conversations</div>
+                    </div>
+                    <a href="https://www.kbb.com" target="_blank">Visit →</a>
+                  </div>
+                  <div class="link-item">
+                    <div class="link-item-left">
+                      <div class="link-item-name">USPS ZIP Code Lookup</div>
+                      <div class="link-item-desc">Verify garaging & mailing ZIP codes</div>
+                    </div>
+                    <a href="https://tools.usps.com/zip-code-lookup.htm" target="_blank">Visit →</a>
+                  </div>
+                  <div class="link-item">
+                    <div class="link-item-left">
+                      <div class="link-item-name">ITC TurboRater (Reference)</div>
+                      <div class="link-item-desc">Industry comparative rater platform</div>
+                    </div>
+                    <a href="https://www.itccorp.com/products/turborater/" target="_blank">Visit →</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-header"><div class="card-title">💡 Underwriting Tips</div></div>
+              <div class="card-body" style="padding:14px;">
+                <div class="accordion-item">
+                  <div class="accordion-trigger" onclick="toggleAccordion(this)">SR-22 Clients <span class="accordion-arrow">▾</span></div>
+                  <div class="accordion-body">Route SR-22 clients to <strong>Dairyland</strong> or <strong>Bristol West</strong> first. Most standard carriers will decline or heavily surcharge. Always confirm filing state and duration required. SR-22 filings typically last 3 years.</div>
+                </div>
+                <div class="accordion-item">
+                  <div class="accordion-trigger" onclick="toggleAccordion(this)">Young Drivers (Under 25) <span class="accordion-arrow">▾</span></div>
+                  <div class="accordion-body">Young drivers see 30–50% surcharges at most carriers. Ask about <strong>Good Student Discount</strong> (3.0+ GPA) and <strong>Defensive Driver courses</strong> — both are underutilized discounts. Lemonade and Progressive tend to be more competitive here.</div>
+                </div>
+                <div class="accordion-item">
+                  <div class="accordion-trigger" onclick="toggleAccordion(this)">Prior Lapse in Coverage <span class="accordion-arrow">▾</span></div>
+                  <div class="accordion-body">A lapse of 30+ days may result in declination from preferred carriers. Bristol West accepts lapses. Always ask how long the lapse was and the reason — new car purchases or moves can sometimes be explained away.</div>
+                </div>
+                <div class="accordion-item">
+                  <div class="accordion-trigger" onclick="toggleAccordion(this)">Homeowner Discounts <span class="accordion-arrow">▾</span></div>
+                  <div class="accordion-body">Homeownership (not just bundling) is a standalone discount at Elephant and several other carriers. Always ask even if the client isn't looking to bundle home insurance.</div>
+                </div>
+                <div class="accordion-item">
+                  <div class="accordion-trigger" onclick="toggleAccordion(this)">Financed / Leased Vehicles <span class="accordion-arrow">▾</span></div>
+                  <div class="accordion-body">Lienholders and lessors require comprehensive and collision coverage. Confirm deductible limits — many lenders cap deductibles at $500. GAP coverage is separate and worth mentioning to financed buyers.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">📝 Agent Notepad</div>
+                <button class="btn-sm btn-sm-teal" onclick="saveNote()">Save</button>
+              </div>
+              <div class="card-body">
+                <textarea class="notepad" id="agentNotepad" placeholder="Jot down notes, reminders, follow-ups..."></textarea>
+                <div class="notepad-actions">
+                  <button class="btn-sm btn-sm-gray" onclick="clearNote()">Clear</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- end page-area -->
+  </div><!-- end main-area -->
+
+  <!-- ══════ QUOTE DETAIL MODAL ══════ -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBackdrop(event)">
     <div class="modal" id="modalContent"></div>
   </div>
 
+  <!-- ══════ CLIENT FORM MODAL ══════ -->
+  <div class="modal-overlay" id="clientModalOverlay" onclick="closeClientModal(event)">
+    <div class="modal" style="width:480px;" id="clientModalContent">
+      <div class="modal-header" style="background:#1a2332;">
+        <h3 id="clientModalTitle">Add New Client</h3>
+        <button class="modal-close" onclick="closeClientModal()">×</button>
+      </div>
+      <div class="modal-body client-modal-body">
+        <div class="grid">
+          <div class="field"><label>First Name</label><input type="text" id="cm-firstName" /></div>
+          <div class="field"><label>Last Name</label><input type="text" id="cm-lastName" /></div>
+          <div class="field"><label>Date of Birth</label><input type="date" id="cm-dob" /></div>
+          <div class="field"><label>State</label>
+            <select id="cm-state"><option value="">Select</option><option>VA</option><option>TX</option><option>TN</option><option>IN</option><option>IL</option><option>OH</option><option>GA</option></select>
+          </div>
+          <div class="field"><label>Phone</label><input type="tel" id="cm-phone" /></div>
+          <div class="field"><label>Email</label><input type="email" id="cm-email" /></div>
+        </div>
+        <div class="field" style="margin-top:12px;">
+          <label>Notes</label>
+          <input type="text" id="cm-notes" placeholder="Optional notes about this client" />
+        </div>
+        <input type="hidden" id="cm-editId" value="" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-close" onclick="closeClientModal()">Cancel</button>
+        <button class="btn-modal-launch" onclick="saveClientFromModal()">Save Client</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ TOAST ══════ -->
+  <div class="toast" id="toast"><span class="toast-icon">✅</span><span id="toastMsg">Saved!</span></div>
+
   <script>
 
-    // ── TAB SWITCHING ──
+    // ════════════════════════════════════
+    // PAGE NAVIGATION
+    // ════════════════════════════════════
+    const pageLabels = { dashboard: 'Dashboard', rater: 'Auto Rater', clients: 'Client Manager', resources: 'Agent Resources' };
+
+    function showPage(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('page-' + name).classList.add('active');
+      document.getElementById('nav-' + name).classList.add('active');
+      document.getElementById('breadcrumb').innerHTML = `<strong>${pageLabels[name]}</strong>`;
+      if (name === 'dashboard') refreshDashboard();
+    }
+
+    function refreshDashboard() {
+      document.getElementById('stat-quotes').textContent = quoteHistory.length;
+      document.getElementById('stat-clients').textContent = clients.length;
+      document.getElementById('clientCountBadge').textContent = clients.length;
+      renderDashQuotes();
+    }
+
+    // Date in top bar
+    document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+
+    // ════════════════════════════════════
+    // TAB SWITCHING (rater)
+    // ════════════════════════════════════
     function switchTab(name) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
@@ -948,7 +1038,6 @@
       document.getElementById('tab-btn-' + name).classList.add('active');
     }
 
-    // ── GARAGING ZIP ──
     function handleGaragingZip() {
       const sel = document.getElementById('garagingZipSelect').value;
       const manual = document.getElementById('garagingZipManual');
@@ -959,34 +1048,33 @@
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('zip').addEventListener('input', function() {
         const opt = document.getElementById('garagingZipSame');
-        opt.textContent = this.value.length === 5
-          ? `Same as Applicant ZIP (${this.value})`
-          : 'Same as Applicant ZIP';
+        opt.textContent = this.value.length === 5 ? `Same as Applicant ZIP (${this.value})` : 'Same as Applicant ZIP';
       });
+      loadNote();
     });
 
-    // ── VALIDATION ──
+    // ════════════════════════════════════
+    // VALIDATION
+    // ════════════════════════════════════
     function validate() {
       const required = [
         { id: 'firstName', tab: 'applicant', label: 'First Name' },
-        { id: 'lastName', tab: 'applicant', label: 'Last Name' },
-        { id: 'dob', tab: 'applicant', label: 'Date of Birth' },
-        { id: 'zip', tab: 'applicant', label: 'ZIP Code' },
-        { id: 'state', tab: 'applicant', label: 'State' },
-        { id: 'homeType', tab: 'applicant', label: 'Residence Type' },
-        { id: 'vehicleYear', tab: 'vehicle', label: 'Vehicle Year' },
-        { id: 'vehicleMake', tab: 'vehicle', label: 'Vehicle Make' },
-        { id: 'vehicleModel', tab: 'vehicle', label: 'Vehicle Model' },
+        { id: 'lastName',  tab: 'applicant', label: 'Last Name' },
+        { id: 'dob',       tab: 'applicant', label: 'Date of Birth' },
+        { id: 'zip',       tab: 'applicant', label: 'ZIP Code' },
+        { id: 'state',     tab: 'applicant', label: 'State' },
+        { id: 'homeType',  tab: 'applicant', label: 'Residence Type' },
+        { id: 'vehicleYear',      tab: 'vehicle', label: 'Vehicle Year' },
+        { id: 'vehicleMake',      tab: 'vehicle', label: 'Vehicle Make' },
+        { id: 'vehicleModel',     tab: 'vehicle', label: 'Vehicle Model' },
         { id: 'vehicleOwnership', tab: 'vehicle', label: 'Vehicle Ownership' },
-        { id: 'vehicleUse', tab: 'vehicle', label: 'Primary Use' },
-        { id: 'annualMileage', tab: 'vehicle', label: 'Annual Mileage' },
-        { id: 'licenseState', tab: 'drivers', label: 'License State' },
+        { id: 'vehicleUse',       tab: 'vehicle', label: 'Primary Use' },
+        { id: 'annualMileage',    tab: 'vehicle', label: 'Annual Mileage' },
+        { id: 'licenseState',     tab: 'drivers', label: 'License State' },
       ];
-
       document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
       document.querySelectorAll('.error-msg').forEach(e => e.remove());
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('has-error'));
-
       const errorFields = [];
       required.forEach(f => {
         const el = document.getElementById(f.id);
@@ -999,7 +1087,6 @@
           errorFields.push(f);
         }
       });
-
       let banner = document.getElementById('validationBanner');
       if (!banner) {
         banner = document.createElement('div');
@@ -1007,7 +1094,6 @@
         banner.className = 'validation-banner';
         document.querySelector('.tab-content').prepend(banner);
       }
-
       if (errorFields.length > 0) {
         const tabs = {};
         errorFields.forEach(f => {
@@ -1015,11 +1101,9 @@
           tabs[f.tab].push(f.label);
           document.getElementById('tab-btn-' + f.tab).classList.add('has-error');
         });
-        const tabNames = { applicant: 'Applicant', vehicle: 'Vehicle', drivers: 'Drivers', coverage: 'Coverage' };
+        const tabNames = { applicant:'Applicant', vehicle:'Vehicle', drivers:'Drivers', coverage:'Coverage' };
         banner.innerHTML = '⚠️ Please complete required fields: ' +
-          Object.entries(tabs).map(([t, fields]) =>
-            `<strong>${tabNames[t]}</strong> (${fields.join(', ')})`
-          ).join(' — ');
+          Object.entries(tabs).map(([t, fields]) => `<strong>${tabNames[t]}</strong> (${fields.join(', ')})`).join(' — ');
         banner.style.display = 'block';
         const firstTab = errorFields[0].tab;
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -1028,16 +1112,17 @@
         document.getElementById('tab-btn-' + firstTab).classList.add('active');
         return false;
       }
-
       banner.style.display = 'none';
       return true;
     }
 
-    // ── CLEAR FORM ──
+    // ════════════════════════════════════
+    // CLEAR FORM
+    // ════════════════════════════════════
     function clearForm() {
       if (!confirm('Clear all fields?')) return;
-      document.querySelectorAll('input').forEach(i => i.value = '');
-      document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+      document.querySelectorAll('#page-rater input').forEach(i => i.value = '');
+      document.querySelectorAll('#page-rater select').forEach(s => s.selectedIndex = 0);
       document.getElementById('garagingZipManual').style.display = 'none';
       document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
       document.querySelectorAll('.error-msg').forEach(e => e.remove());
@@ -1047,20 +1132,20 @@
       document.getElementById('resultsPanel').classList.remove('visible');
     }
 
-    // ── DEV FILL ──
+    // ════════════════════════════════════
+    // DEV FILL
+    // ════════════════════════════════════
     function devFill() {
       const firstNames = ['James','Maria','DeShawn','Priya','Carlos','Ashley','Tyler','Nguyen','Brittany','Marcus'];
       const lastNames  = ['Johnson','Williams','Patel','Garcia','Thompson','Kim','Davis','Okafor','Martinez','Reed'];
       const streets    = ['142 Maple St','3801 Oak Ave','27 Elm Blvd','5500 Pine Rd','88 Cedar Ln'];
-      const cities     = { VA: 'Richmond', TX: 'Austin', TN: 'Nashville', IN: 'Indianapolis', IL: 'Chicago', OH: 'Columbus', GA: 'Atlanta' };
-      const zips       = { VA: '23220', TX: '78701', TN: '37201', IN: '46201', IL: '60601', OH: '43215', GA: '30301' };
+      const cities     = { VA:'Richmond', TX:'Austin', TN:'Nashville', IN:'Indianapolis', IL:'Chicago', OH:'Columbus', GA:'Atlanta' };
+      const zips       = { VA:'23220', TX:'78701', TN:'37201', IN:'46201', IL:'60601', OH:'43215', GA:'30301' };
       const makes      = ['Toyota','Honda','Ford','Chevrolet','Nissan','Hyundai','Kia','Subaru'];
       const models     = { Toyota:['Camry','Corolla','RAV4'], Honda:['Civic','Accord','CR-V'], Ford:['F-150','Escape','Fusion'], Chevrolet:['Silverado','Malibu','Equinox'], Nissan:['Altima','Sentra','Rogue'], Hyundai:['Elantra','Sonata','Tucson'], Kia:['Optima','Soul','Sportage'], Subaru:['Outback','Forester','Impreza'] };
-      const carriers   = ['Elephant Insurance','State Farm','Allstate','GEICO','Progressive'];
-
+      const carrierNames = ['Elephant Insurance','State Farm','Allstate','GEICO','Progressive'];
       function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
       function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-
       const state = pick(['VA','TX','TN','IN','IL','OH','GA']);
       const make  = pick(makes);
       const model = pick(models[make]);
@@ -1068,8 +1153,6 @@
       const dobYear = randInt(1965, 2000);
       const dobMonth = String(randInt(1,12)).padStart(2,'0');
       const dobDay   = String(randInt(1,28)).padStart(2,'0');
-
-      // Applicant
       document.getElementById('firstName').value      = pick(firstNames);
       document.getElementById('lastName').value       = pick(lastNames);
       document.getElementById('dob').value            = `${dobYear}-${dobMonth}-${dobDay}`;
@@ -1082,12 +1165,7 @@
       document.getElementById('homeType').value       = pick(['Own Home','Rent','Rent','Live with Parents']);
       document.getElementById('email').value          = 'test@example.com';
       document.getElementById('phone').value          = '555-867-5309';
-
-      // Update garaging ZIP label
-      const garagingOpt = document.getElementById('garagingZipSame');
-      garagingOpt.textContent = `Same as Applicant ZIP (${zips[state]})`;
-
-      // Vehicle
+      document.getElementById('garagingZipSame').textContent = `Same as Applicant ZIP (${zips[state]})`;
       document.getElementById('vehicleYear').value      = year;
       document.getElementById('vehicleMake').value      = make;
       document.getElementById('vehicleModel').value     = model;
@@ -1096,35 +1174,30 @@
       document.getElementById('annualMileage').value    = pick(['10000','12500','15000','7500']);
       document.getElementById('garagingZipSelect').value = 'same';
       document.getElementById('garagingZipManual').style.display = 'none';
-
-      // Drivers
       document.getElementById('licenseState').value     = state;
       document.getElementById('ageLicensed').value      = randInt(16, 18);
       document.getElementById('violations').value       = pick(['none','none','none','ticket','accident']);
       document.getElementById('sr22').value             = 'no';
       document.getElementById('currentlyInsured').value = 'yes';
-      document.getElementById('currentCarrier').value   = pick(carriers);
+      document.getElementById('currentCarrier').value   = pick(carrierNames);
       document.getElementById('yearsInsured').value     = pick(['1-2','3-5','3-5','6+']);
       document.getElementById('shoppingReason').value   = pick(['Price','Renewal','New Vehicle']);
-
-      // Coverage — leave sensible defaults, just set effective date
       const today = new Date();
       today.setDate(today.getDate() + 1);
       document.getElementById('effectiveDate').value = today.toISOString().split('T')[0];
-
-      // Clear any leftover errors
       document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
       document.querySelectorAll('.error-msg').forEach(e => e.remove());
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('has-error'));
       const banner = document.getElementById('validationBanner');
       if (banner) banner.style.display = 'none';
-
-      // Jump to Applicant tab so user can see what filled in
       switchTab('applicant');
     }
 
-    // ── RATING ENGINE ──
+    // ════════════════════════════════════
+    // RATING ENGINE
+    // ════════════════════════════════════
     let quoteResults = [];
+    let quoteHistory = [];
 
     function calcPremium(carrierBase) {
       const dob = new Date(document.getElementById('dob').value);
@@ -1145,7 +1218,6 @@
       const defensiveDriving = document.getElementById('defensiveDriving').value;
       const antiTheft = document.getElementById('antiTheft').value;
       const paymentPlan = document.getElementById('paymentPlan').value;
-
       let b = carrierBase;
       if (age < 25) b += 45; else if (age < 30) b += 20; else if (age > 70) b += 18;
       if (violations === 'ticket') b += 22;
@@ -1185,7 +1257,6 @@
       const homeType = document.getElementById('homeType').value;
       const mileage = parseInt(document.getElementById('annualMileage').value) || 0;
       const currentlyInsured = document.getElementById('currentlyInsured').value;
-
       if (age < 25) notes.push({ text: 'Young driver surcharge', type: 'surcharge' });
       if (violations === 'ticket') notes.push({ text: 'Speeding ticket surcharge', type: 'surcharge' });
       if (violations === 'accident') notes.push({ text: 'At-fault accident surcharge', type: 'surcharge' });
@@ -1203,95 +1274,34 @@
       return notes;
     }
 
-    // ── RUN QUOTES ──
     function runQuotes() {
       if (!validate()) return;
-
       const zip = document.getElementById('zip').value;
       const firstName = document.getElementById('firstName').value;
       const lastName = document.getElementById('lastName').value;
-      const dob = document.getElementById('dob').value;
       const vehicleYear = document.getElementById('vehicleYear').value;
       const vehicleMake = document.getElementById('vehicleMake').value;
       const vehicleModel = document.getElementById('vehicleModel').value;
       const liability = document.getElementById('liability').value;
       const comp = document.getElementById('compDeductible').value;
       const coll = document.getElementById('collDeductible').value;
-
       const notes = buildNotes();
-
-      // Elephant is always first and uses the real quote URL
       quoteResults = [
-        {
-          id: 'elephant',
-          name: 'Elephant Insurance',
-          tagline: 'Preferred Partner',
-          isElephant: true,
-          base: 76,
-          launchUrl: `https://quotes.elephant.com/start/name?zip=${zip}`,
-          launchLabel: 'Launch Elephant Quote →'
-        },
-        {
-          id: 'bristol',
-          name: 'Bristol West',
-          tagline: 'Non-Standard Auto',
-          isElephant: false,
-          base: 82,
-          launchUrl: `https://www.bristolwest.com/`,
-          launchLabel: 'Launch Bristol West →'
-        },
-        {
-          id: 'progressive',
-          name: 'Progressive',
-          tagline: 'Name Your Price®',
-          isElephant: false,
-          base: 88,
-          launchUrl: `https://www.progressive.com/auto/`,
-          launchLabel: 'Launch Progressive →'
-        },
-        {
-          id: 'dairyland',
-          name: 'Dairyland Auto',
-          tagline: 'SR-22 & Non-Standard Specialist',
-          isElephant: false,
-          base: 98,
-          launchUrl: `https://www.dairyland.com/`,
-          launchLabel: 'Launch Dairyland →'
-        },
-        {
-          id: 'lemonade',
-          name: 'Lemonade Auto',
-          tagline: 'Tech-Forward. Flat Fee.',
-          isElephant: false,
-          base: 86,
-          launchUrl: `https://www.lemonade.com/car/`,
-          launchLabel: 'Launch Lemonade →'
-        },
-        {
-          id: 'safeco',
-          name: 'Safeco',
-          tagline: 'A Liberty Mutual Company',
-          isElephant: false,
-          base: 90,
-          launchUrl: `https://www.safeco.com/`,
-          launchLabel: 'Launch Safeco →'
-        },
-      ].map(c => ({
-        ...c,
-        monthly: calcPremium(c.base),
-        notes,
-      }));
+        { id:'elephant', name:'Elephant Insurance', tagline:'Preferred Partner', isElephant:true, base:76, launchUrl:`https://quotes.elephant.com/start/name?zip=${zip}`, launchLabel:'Launch Elephant Quote →' },
+        { id:'bristol',  name:'Bristol West',       tagline:'Non-Standard Auto', isElephant:false, base:82, launchUrl:'https://www.bristolwest.com/', launchLabel:'Launch Bristol West →' },
+        { id:'progressive', name:'Progressive',     tagline:'Name Your Price®',  isElephant:false, base:88, launchUrl:'https://www.progressive.com/auto/', launchLabel:'Launch Progressive →' },
+        { id:'dairyland', name:'Dairyland Auto',    tagline:'SR-22 & Non-Standard Specialist', isElephant:false, base:98, launchUrl:'https://www.dairyland.com/', launchLabel:'Launch Dairyland →' },
+        { id:'lemonade',  name:'Lemonade Auto',     tagline:'Tech-Forward. Flat Fee.', isElephant:false, base:86, launchUrl:'https://www.lemonade.com/car/', launchLabel:'Launch Lemonade →' },
+        { id:'safeco',    name:'Safeco',             tagline:'A Liberty Mutual Company', isElephant:false, base:90, launchUrl:'https://www.safeco.com/', launchLabel:'Launch Safeco →' },
+      ].map(c => ({ ...c, monthly: calcPremium(c.base), notes }));
 
       renderResults();
-
       document.getElementById('resultsMeta').textContent =
         `${firstName} ${lastName} | ${vehicleYear} ${vehicleMake} ${vehicleModel} | ${liability} BI | Comp: ${comp} / Coll: ${coll}`;
-
       document.getElementById('resultsPanel').classList.add('visible');
       document.getElementById('resultsPanel').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // ── RENDER RESULTS ──
     function renderResults() {
       const liability = document.getElementById('liability').value;
       const comp = document.getElementById('compDeductible').value;
@@ -1300,26 +1310,19 @@
       const medPay = document.getElementById('medPay').value;
       const roadside = document.getElementById('roadside').value;
       const rental = document.getElementById('rental').value;
-
-      // Elephant always first, others sorted by price
       const elephant = quoteResults.find(c => c.isElephant);
-      const others = quoteResults.filter(c => !c.isElephant)
-        .sort((a, b) => a.monthly - b.monthly);
+      const others = quoteResults.filter(c => !c.isElephant).sort((a, b) => a.monthly - b.monthly);
       const sorted = [elephant, ...others];
-
       const table = document.getElementById('comparisonTable');
       table.innerHTML = '';
-
-      sorted.forEach((carrier, idx) => {
+      sorted.forEach(carrier => {
         const isLowest = !carrier.isElephant && carrier.monthly === Math.min(...others.map(o => o.monthly));
         const col = document.createElement('div');
         col.className = `carrier-col${carrier.isElephant ? ' elephant' : ''}`;
         col.id = `col-${carrier.id}`;
-
         const noteTags = carrier.notes.map(n =>
           `<span class="note-tag ${n.type === 'surcharge' ? 'surcharge' : ''}">${n.text}</span>`
         ).join('');
-
         col.innerHTML = `
           <div class="carrier-header">
             ${carrier.isElephant ? '<div class="carrier-badge">⭐ PREFERRED CARRIER</div>' : ''}
@@ -1333,245 +1336,352 @@
             <div class="price-annual">Annual est: $${carrier.monthly * 12}</div>
           </div>
           <div class="carrier-coverages">
-            <div class="coverage-row">
-              <span class="coverage-label">Bodily Injury</span>
-              <span class="coverage-value">${liability}</span>
-            </div>
-            <div class="coverage-row">
-              <span class="coverage-label">Comprehensive</span>
-              <span class="coverage-value">${comp === 'none' ? 'None' : '$' + comp}</span>
-            </div>
-            <div class="coverage-row">
-              <span class="coverage-label">Collision</span>
-              <span class="coverage-value">${coll === 'none' ? 'None' : '$' + coll}</span>
-            </div>
-            <div class="coverage-row">
-              <span class="coverage-label">UM/UIM</span>
-              <span class="coverage-value">${umUim === 'none' ? 'None' : umUim}</span>
-            </div>
-            <div class="coverage-row">
-              <span class="coverage-label">Med Pay</span>
-              <span class="coverage-value">${medPay === 'none' ? 'None' : '$' + parseInt(medPay).toLocaleString()}</span>
-            </div>
-            <div class="coverage-row">
-              <span class="coverage-label">Roadside</span>
-              <span class="coverage-value">${roadside === 'yes' ? '✓ Yes' : 'No'}</span>
-            </div>
-            <div class="coverage-row">
-              <span class="coverage-label">Rental</span>
-              <span class="coverage-value">${rental === 'yes' ? '✓ Yes' : 'No'}</span>
-            </div>
+            <div class="coverage-row"><span class="coverage-label">Bodily Injury</span><span class="coverage-value">${liability}</span></div>
+            <div class="coverage-row"><span class="coverage-label">Comprehensive</span><span class="coverage-value">${comp === 'none' ? 'None' : '$'+comp}</span></div>
+            <div class="coverage-row"><span class="coverage-label">Collision</span><span class="coverage-value">${coll === 'none' ? 'None' : '$'+coll}</span></div>
+            <div class="coverage-row"><span class="coverage-label">UM/UIM</span><span class="coverage-value">${umUim === 'none' ? 'None' : umUim}</span></div>
+            <div class="coverage-row"><span class="coverage-label">Med Pay</span><span class="coverage-value">${medPay === 'none' ? 'None' : '$'+parseInt(medPay).toLocaleString()}</span></div>
+            <div class="coverage-row"><span class="coverage-label">Roadside</span><span class="coverage-value">${roadside === 'yes' ? '✓ Yes' : 'No'}</span></div>
+            <div class="coverage-row"><span class="coverage-label">Rental</span><span class="coverage-value">${rental === 'yes' ? '✓ Yes' : 'No'}</span></div>
           </div>
           <div class="carrier-notes">${noteTags}</div>
           <div class="carrier-actions">
-            <button class="btn-select-quote" onclick="openModal('${carrier.id}')">
-              View Full Quote Details
-            </button>
-            <a class="btn-launch" href="${carrier.launchUrl}" target="_blank">
-              ${carrier.launchLabel}
-            </a>
-          </div>
-        `;
+            <button class="btn-select-quote" onclick="openModal('${carrier.id}')">View Full Quote Details</button>
+            <a class="btn-launch" href="${carrier.launchUrl}" target="_blank">${carrier.launchLabel}</a>
+          </div>`;
         table.appendChild(col);
       });
     }
 
-    // ── SORT ──
     function sortResults(by, btn) {
       document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      if (by === 'price') {
-        quoteResults.sort((a, b) => {
-          if (a.isElephant) return -1;
-          if (b.isElephant) return 1;
-          return a.monthly - b.monthly;
-        });
-      } else {
-        quoteResults.sort((a, b) => {
-          if (a.isElephant) return -1;
-          if (b.isElephant) return 1;
-          return a.name.localeCompare(b.name);
-        });
-      }
+      quoteResults.sort((a, b) => {
+        if (a.isElephant) return -1;
+        if (b.isElephant) return 1;
+        return by === 'price' ? a.monthly - b.monthly : a.name.localeCompare(b.name);
+      });
       renderResults();
     }
 
-    // ── MODAL ──
+    // ════════════════════════════════════
+    // SAVE QUOTE TO HISTORY
+    // ════════════════════════════════════
+    function saveQuoteToHistory() {
+      if (!quoteResults.length) return;
+      const lowestOther = quoteResults.filter(c => !c.isElephant).sort((a,b) => a.monthly - b.monthly)[0];
+      const elephant = quoteResults.find(c => c.isElephant);
+      quoteHistory.unshift({
+        name: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`,
+        vehicle: `${document.getElementById('vehicleYear').value} ${document.getElementById('vehicleMake').value} ${document.getElementById('vehicleModel').value}`,
+        state: document.getElementById('state').value,
+        liability: document.getElementById('liability').value,
+        lowestRate: `$${lowestOther ? lowestOther.monthly : elephant.monthly}/mo`,
+        time: new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' })
+      });
+      showToast('Quote saved to history!');
+      refreshDashboard();
+    }
+
+    function renderDashQuotes() {
+      const tbody = document.getElementById('dashQuoteBody');
+      if (!quoteHistory.length) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No quotes run yet this session. Hit ⚡ New Quote to get started.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = quoteHistory.slice(0,8).map(q => `
+        <tr>
+          <td><strong>${q.name}</strong></td>
+          <td>${q.vehicle}</td>
+          <td>${q.state}</td>
+          <td>${q.liability} BI</td>
+          <td><strong style="color:#0a9396">${q.lowestRate}</strong></td>
+          <td>${q.time}</td>
+        </tr>`).join('');
+    }
+
+    // ════════════════════════════════════
+    // QUOTE DETAIL MODAL
+    // ════════════════════════════════════
     function openModal(carrierId) {
       const carrier = quoteResults.find(c => c.id === carrierId);
       if (!carrier) return;
-
-      const firstName = document.getElementById('firstName').value;
-      const lastName = document.getElementById('lastName').value;
-      const dob = document.getElementById('dob').value;
-      const address = document.getElementById('address').value;
-      const city = document.getElementById('city').value;
-      const state = document.getElementById('state').value;
-      const zip = document.getElementById('zip').value;
-      const vehicleYear = document.getElementById('vehicleYear').value;
-      const vehicleMake = document.getElementById('vehicleMake').value;
-      const vehicleModel = document.getElementById('vehicleModel').value;
-      const vehicleTrim = document.getElementById('vehicleTrim').value;
-      const vehicleOwnership = document.getElementById('vehicleOwnership').value;
-      const vehicleUse = document.getElementById('vehicleUse').value;
-      const liability = document.getElementById('liability').value;
-      const propertyDamage = document.getElementById('propertyDamage').value;
-      const comp = document.getElementById('compDeductible').value;
-      const coll = document.getElementById('collDeductible').value;
-      const umUim = document.getElementById('umUim').value;
-      const medPay = document.getElementById('medPay').value;
-      const roadside = document.getElementById('roadside').value;
-      const rental = document.getElementById('rental').value;
-      const accForgiveness = document.getElementById('accidentForgiveness').value;
-      const newCar = document.getElementById('newCarReplacement').value;
-      const effectiveDate = document.getElementById('effectiveDate').value;
-      const paymentPlan = document.getElementById('paymentPlan').value;
-
+      const v = id => document.getElementById(id).value;
       const noteTags = carrier.notes.map(n =>
-        `<span class="note-tag ${n.type === 'surcharge' ? 'surcharge' : ''}">${n.text}</span>`
-      ).join(' ');
-
+        `<span class="note-tag ${n.type === 'surcharge' ? 'surcharge' : ''}">${n.text}</span>`).join(' ');
       document.getElementById('modalContent').innerHTML = `
         <div class="modal-header" style="${carrier.isElephant ? 'background:#003d4d' : ''}">
           <h3>${carrier.isElephant ? '⭐ ' : ''}${carrier.name} — Quote Summary</h3>
           <button class="modal-close" onclick="closeModal()">×</button>
         </div>
         <div class="modal-body">
-
           <div class="modal-section">
             <div class="modal-section-title">Price Breakdown</div>
             <div class="price-breakdown">
-              <div class="price-box">
-                <div class="price-box-label">Monthly</div>
-                <div class="price-box-value">$${carrier.monthly}<span>/mo</span></div>
-              </div>
-              <div class="price-box">
-                <div class="price-box-label">6-Month Premium</div>
-                <div class="price-box-value">$${carrier.monthly * 6}</div>
-              </div>
-              <div class="price-box">
-                <div class="price-box-label">Annual Estimate</div>
-                <div class="price-box-value">$${carrier.monthly * 12}</div>
-              </div>
+              <div class="price-box"><div class="price-box-label">Monthly</div><div class="price-box-value">$${carrier.monthly}<span>/mo</span></div></div>
+              <div class="price-box"><div class="price-box-label">6-Month Premium</div><div class="price-box-value">$${carrier.monthly*6}</div></div>
+              <div class="price-box"><div class="price-box-label">Annual Estimate</div><div class="price-box-value">$${carrier.monthly*12}</div></div>
             </div>
           </div>
-
           <div class="modal-section">
             <div class="modal-section-title">Applicant Information</div>
             <div class="modal-grid">
-              <div class="modal-row">
-                <div class="modal-row-label">Name</div>
-                <div class="modal-row-value">${firstName} ${lastName}</div>
-              </div>
-              <div class="modal-row">
-                <div class="modal-row-label">Date of Birth</div>
-                <div class="modal-row-value">${dob}</div>
-              </div>
-              <div class="modal-row">
-                <div class="modal-row-label">Address</div>
-                <div class="modal-row-value">${address}, ${city}, ${state} ${zip}</div>
-              </div>
-              <div class="modal-row">
-                <div class="modal-row-label">Payment Plan</div>
-                <div class="modal-row-value">${paymentPlan}</div>
-              </div>
-              ${effectiveDate ? `
-              <div class="modal-row">
-                <div class="modal-row-label">Effective Date</div>
-                <div class="modal-row-value">${effectiveDate}</div>
-              </div>` : ''}
+              <div class="modal-row"><div class="modal-row-label">Name</div><div class="modal-row-value">${v('firstName')} ${v('lastName')}</div></div>
+              <div class="modal-row"><div class="modal-row-label">Date of Birth</div><div class="modal-row-value">${v('dob')}</div></div>
+              <div class="modal-row"><div class="modal-row-label">Address</div><div class="modal-row-value">${v('address')}, ${v('city')}, ${v('state')} ${v('zip')}</div></div>
+              <div class="modal-row"><div class="modal-row-label">Payment Plan</div><div class="modal-row-value">${v('paymentPlan')}</div></div>
+              ${v('effectiveDate') ? `<div class="modal-row"><div class="modal-row-label">Effective Date</div><div class="modal-row-value">${v('effectiveDate')}</div></div>` : ''}
             </div>
           </div>
-
           <div class="modal-section">
             <div class="modal-section-title">Vehicle</div>
             <div class="modal-grid">
-              <div class="modal-row">
-                <div class="modal-row-label">Vehicle</div>
-                <div class="modal-row-value">${vehicleYear} ${vehicleMake} ${vehicleModel} ${vehicleTrim}</div>
-              </div>
-              <div class="modal-row">
-                <div class="modal-row-label">Ownership</div>
-                <div class="modal-row-value">${vehicleOwnership}</div>
-              </div>
-              <div class="modal-row">
-                <div class="modal-row-label">Primary Use</div>
-                <div class="modal-row-value">${vehicleUse}</div>
-              </div>
+              <div class="modal-row"><div class="modal-row-label">Vehicle</div><div class="modal-row-value">${v('vehicleYear')} ${v('vehicleMake')} ${v('vehicleModel')} ${v('vehicleTrim')}</div></div>
+              <div class="modal-row"><div class="modal-row-label">Ownership</div><div class="modal-row-value">${v('vehicleOwnership')}</div></div>
+              <div class="modal-row"><div class="modal-row-label">Primary Use</div><div class="modal-row-value">${v('vehicleUse')}</div></div>
             </div>
           </div>
-
           <div class="modal-section">
             <div class="modal-section-title">Coverage Summary</div>
             <div class="modal-grid">
-              <div class="modal-row">
-                <div class="modal-row-label">Bodily Injury</div>
-                <div class="modal-row-value">${liability}</div>
-              </div>
-              <div class="modal-row">
-                <div class="modal-row-label">Property Damage</div>
-                <div class="modal-row-value">$${parseInt(propertyDamage).toLocaleString()}</div>
-              </div>
-              <div class="modal-row">
-                <div class="modal-row-label">Comprehensive</div>
-                <div class="modal-row-value">${comp === 'none' ? 'No Coverage' : '$' + comp + ' deductible'}</div>
-              </div>
-              <div class="modal-row">
-                <div class="modal-row-label">Collision</div>
-                <div class="modal-row-value">${coll === 'none' ? 'No Coverage' : '$' + coll + ' deductible'}</div>
-              </div>
-              <div class="modal-row">
-                <div class="modal-row-label">UM/UIM</div>
-                <div class="modal-row-value">${umUim === 'none' ? 'None' : umUim}</div>
-              </div>
-              <div class="modal-row">
-                <div class="modal-row-label">Medical Payments</div>
-                <div class="modal-row-value">${medPay === 'none' ? 'None' : '$' + parseInt(medPay).toLocaleString()}</div>
-              </div>
-              <div class="modal-row">
-                <div class="modal-row-label">Roadside Assistance</div>
-                <div class="modal-row-value">${roadside === 'yes' ? '✓ Included' : 'Not included'}</div>
-              </div>
-              <div class="modal-row">
-                <div class="modal-row-label">Rental Coverage</div>
-                <div class="modal-row-value">${rental === 'yes' ? '✓ Included' : 'Not included'}</div>
-              </div>
-              <div class="modal-row">
-                <div class="modal-row-label">Accident Forgiveness</div>
-                <div class="modal-row-value">${accForgiveness === 'yes' ? '✓ Included' : 'Not included'}</div>
-              </div>
-              <div class="modal-row">
-                <div class="modal-row-label">New Car Replacement</div>
-                <div class="modal-row-value">${newCar === 'yes' ? '✓ Included' : 'Not included'}</div>
-              </div>
+              <div class="modal-row"><div class="modal-row-label">Bodily Injury</div><div class="modal-row-value">${v('liability')}</div></div>
+              <div class="modal-row"><div class="modal-row-label">Property Damage</div><div class="modal-row-value">$${parseInt(v('propertyDamage')).toLocaleString()}</div></div>
+              <div class="modal-row"><div class="modal-row-label">Comprehensive</div><div class="modal-row-value">${v('compDeductible')==='none'?'No Coverage':'$'+v('compDeductible')+' ded.'}</div></div>
+              <div class="modal-row"><div class="modal-row-label">Collision</div><div class="modal-row-value">${v('collDeductible')==='none'?'No Coverage':'$'+v('collDeductible')+' ded.'}</div></div>
+              <div class="modal-row"><div class="modal-row-label">UM/UIM</div><div class="modal-row-value">${v('umUim')==='none'?'None':v('umUim')}</div></div>
+              <div class="modal-row"><div class="modal-row-label">Medical Payments</div><div class="modal-row-value">${v('medPay')==='none'?'None':'$'+parseInt(v('medPay')).toLocaleString()}</div></div>
+              <div class="modal-row"><div class="modal-row-label">Roadside Assistance</div><div class="modal-row-value">${v('roadside')==='yes'?'✓ Included':'Not included'}</div></div>
+              <div class="modal-row"><div class="modal-row-label">Rental Coverage</div><div class="modal-row-value">${v('rental')==='yes'?'✓ Included':'Not included'}</div></div>
+              <div class="modal-row"><div class="modal-row-label">Accident Forgiveness</div><div class="modal-row-value">${v('accidentForgiveness')==='yes'?'✓ Included':'Not included'}</div></div>
+              <div class="modal-row"><div class="modal-row-label">New Car Replacement</div><div class="modal-row-value">${v('newCarReplacement')==='yes'?'✓ Included':'Not included'}</div></div>
             </div>
           </div>
-
           <div class="modal-section">
             <div class="modal-section-title">Underwriting Notes</div>
             <div class="modal-notes">${noteTags}</div>
           </div>
-
         </div>
         <div class="modal-footer">
           <button class="btn-modal-close" onclick="closeModal()">Close</button>
-          <a class="btn-modal-launch" href="${carrier.launchUrl}" target="_blank">
-            ${carrier.launchLabel}
-          </a>
-        </div>
-      `;
-
+          <a class="btn-modal-launch" href="${carrier.launchUrl}" target="_blank">${carrier.launchLabel}</a>
+        </div>`;
       document.getElementById('col-' + carrierId)?.classList.add('selected');
       document.getElementById('modalOverlay').classList.add('visible');
     }
 
-    function closeModal() {
-      document.getElementById('modalOverlay').classList.remove('visible');
+    function closeModal() { document.getElementById('modalOverlay').classList.remove('visible'); }
+    function closeModalOnBackdrop(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+    // ════════════════════════════════════
+    // CLIENT MANAGER
+    // ════════════════════════════════════
+    let clients = JSON.parse(localStorage.getItem('agentdesk_clients') || '[]');
+
+    function saveClientsToStorage() {
+      localStorage.setItem('agentdesk_clients', JSON.stringify(clients));
+      document.getElementById('clientCountBadge').textContent = clients.length;
+      document.getElementById('stat-clients').textContent = clients.length;
     }
 
-    function closeModalOnBackdrop(e) {
-      if (e.target === document.getElementById('modalOverlay')) closeModal();
+    function renderClientTable() {
+      const query = document.getElementById('clientSearch').value.toLowerCase();
+      const filtered = clients.filter(c =>
+        `${c.firstName} ${c.lastName} ${c.state} ${c.lastCarrier}`.toLowerCase().includes(query)
+      );
+      const tbody = document.getElementById('clientTableBody');
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No clients found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = filtered.map(c => `
+        <tr>
+          <td><strong>${c.firstName} ${c.lastName}</strong>${c.notes ? `<br><span style="font-size:11px;color:#9ca3af">${c.notes}</span>` : ''}</td>
+          <td>${c.dob || '—'}</td>
+          <td>${c.state || '—'}</td>
+          <td>${c.lastVehicle || '—'}</td>
+          <td>${c.lastCarrier ? `<span class="badge badge-teal">${c.lastCarrier}</span>` : '—'}</td>
+          <td>${c.lastQuoted || '—'}</td>
+          <td style="display:flex;gap:6px;">
+            <button class="btn-sm btn-sm-teal" onclick="editClient('${c.id}')">Edit</button>
+            <button class="btn-sm btn-sm-gray" onclick="loadClientToRater('${c.id}')">Quote</button>
+            <button class="btn-sm btn-sm-red" onclick="deleteClient('${c.id}')">✕</button>
+          </td>
+        </tr>`).join('');
     }
+
+    function openNewClientModal() {
+      document.getElementById('clientModalTitle').textContent = 'Add New Client';
+      document.getElementById('cm-firstName').value = '';
+      document.getElementById('cm-lastName').value = '';
+      document.getElementById('cm-dob').value = '';
+      document.getElementById('cm-state').value = '';
+      document.getElementById('cm-phone').value = '';
+      document.getElementById('cm-email').value = '';
+      document.getElementById('cm-notes').value = '';
+      document.getElementById('cm-editId').value = '';
+      document.getElementById('clientModalOverlay').classList.add('visible');
+    }
+
+    function closeClientModal(e) {
+      if (!e || e.target === document.getElementById('clientModalOverlay'))
+        document.getElementById('clientModalOverlay').classList.remove('visible');
+    }
+
+    function saveClientFromModal() {
+      const editId = document.getElementById('cm-editId').value;
+      const clientData = {
+        id: editId || Date.now().toString(),
+        firstName: document.getElementById('cm-firstName').value.trim(),
+        lastName: document.getElementById('cm-lastName').value.trim(),
+        dob: document.getElementById('cm-dob').value,
+        state: document.getElementById('cm-state').value,
+        phone: document.getElementById('cm-phone').value,
+        email: document.getElementById('cm-email').value,
+        notes: document.getElementById('cm-notes').value,
+        lastVehicle: '',
+        lastCarrier: '',
+        lastQuoted: ''
+      };
+      if (!clientData.firstName || !clientData.lastName) {
+        alert('First and last name are required.'); return;
+      }
+      if (editId) {
+        const idx = clients.findIndex(c => c.id === editId);
+        if (idx !== -1) { const old = clients[idx]; clients[idx] = {...old, ...clientData}; }
+      } else {
+        clients.unshift(clientData);
+      }
+      saveClientsToStorage();
+      renderClientTable();
+      document.getElementById('clientModalOverlay').classList.remove('visible');
+      showToast(editId ? 'Client updated!' : 'Client added!');
+    }
+
+    function editClient(id) {
+      const c = clients.find(cl => cl.id === id);
+      if (!c) return;
+      document.getElementById('clientModalTitle').textContent = 'Edit Client';
+      document.getElementById('cm-firstName').value = c.firstName;
+      document.getElementById('cm-lastName').value  = c.lastName;
+      document.getElementById('cm-dob').value       = c.dob || '';
+      document.getElementById('cm-state').value     = c.state || '';
+      document.getElementById('cm-phone').value     = c.phone || '';
+      document.getElementById('cm-email').value     = c.email || '';
+      document.getElementById('cm-notes').value     = c.notes || '';
+      document.getElementById('cm-editId').value    = c.id;
+      document.getElementById('clientModalOverlay').classList.add('visible');
+    }
+
+    function deleteClient(id) {
+      if (!confirm('Delete this client?')) return;
+      clients = clients.filter(c => c.id !== id);
+      saveClientsToStorage();
+      renderClientTable();
+      showToast('Client deleted.');
+    }
+
+    function loadClientToRater(id) {
+      const c = clients.find(cl => cl.id === id);
+      if (!c) return;
+      showPage('rater');
+      setTimeout(() => {
+        document.getElementById('firstName').value = c.firstName;
+        document.getElementById('lastName').value  = c.lastName;
+        if (c.dob) document.getElementById('dob').value = c.dob;
+        if (c.state) document.getElementById('state').value = c.state;
+        if (c.phone) document.getElementById('phone').value = c.phone;
+        if (c.email) document.getElementById('email').value = c.email;
+        switchTab('applicant');
+        showToast(`Loaded ${c.firstName} ${c.lastName} into rater`);
+      }, 100);
+    }
+
+    function saveCurrentApplicantAsClient() {
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName  = document.getElementById('lastName').value.trim();
+      if (!firstName || !lastName) { alert('Please fill in at least a first and last name first.'); return; }
+      const existing = clients.find(c => c.firstName === firstName && c.lastName === lastName);
+      if (existing && !confirm(`${firstName} ${lastName} is already in your clients. Update their record?`)) return;
+      const clientData = {
+        id: existing ? existing.id : Date.now().toString(),
+        firstName, lastName,
+        dob:   document.getElementById('dob').value,
+        state: document.getElementById('state').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        notes: existing ? existing.notes : '',
+        lastVehicle: `${document.getElementById('vehicleYear').value} ${document.getElementById('vehicleMake').value} ${document.getElementById('vehicleModel').value}`.trim(),
+        lastCarrier: quoteResults.length ? quoteResults.find(c=>c.isElephant)?.name || '' : '',
+        lastQuoted: new Date().toLocaleDateString()
+      };
+      if (existing) {
+        const idx = clients.findIndex(c => c.id === existing.id);
+        clients[idx] = clientData;
+      } else {
+        clients.unshift(clientData);
+      }
+      saveClientsToStorage();
+      renderClientTable();
+      showToast(`${firstName} ${lastName} saved to clients!`);
+    }
+
+    function saveQuoteToClient() {
+      if (!quoteResults.length) return;
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName  = document.getElementById('lastName').value.trim();
+      if (!firstName || !lastName) return;
+      const idx = clients.findIndex(c => c.firstName === firstName && c.lastName === lastName);
+      if (idx !== -1) {
+        const lowestOther = quoteResults.filter(c=>!c.isElephant).sort((a,b)=>a.monthly-b.monthly)[0];
+        clients[idx].lastCarrier = lowestOther ? lowestOther.name : 'Elephant Insurance';
+        clients[idx].lastVehicle = `${document.getElementById('vehicleYear').value} ${document.getElementById('vehicleMake').value} ${document.getElementById('vehicleModel').value}`;
+        clients[idx].lastQuoted  = new Date().toLocaleDateString();
+        saveClientsToStorage();
+      }
+    }
+
+    // ════════════════════════════════════
+    // RESOURCES — ACCORDION & NOTEPAD
+    // ════════════════════════════════════
+    function toggleAccordion(trigger) {
+      const body  = trigger.nextElementSibling;
+      const arrow = trigger.querySelector('.accordion-arrow');
+      const isOpen = body.classList.contains('open');
+      body.classList.toggle('open', !isOpen);
+      arrow.classList.toggle('open', !isOpen);
+    }
+
+    function saveNote() {
+      const val = document.getElementById('agentNotepad').value;
+      localStorage.setItem('agentdesk_note', val);
+      showToast('Note saved!');
+    }
+    function clearNote() {
+      if (confirm('Clear your notepad?')) {
+        document.getElementById('agentNotepad').value = '';
+        localStorage.removeItem('agentdesk_note');
+      }
+    }
+    function loadNote() {
+      const saved = localStorage.getItem('agentdesk_note');
+      if (saved) document.getElementById('agentNotepad').value = saved;
+    }
+
+    // ════════════════════════════════════
+    // TOAST
+    // ════════════════════════════════════
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    // ════════════════════════════════════
+    // INIT
+    // ════════════════════════════════════
+    refreshDashboard();
+    renderClientTable();
 
   </script>
 </body>
