@@ -1,478 +1,901 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Auto Insurance Quote</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+<head>
+  <meta charset="UTF-8" />
+  <title>Agency Rater</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f4f8;
-    color: #333;
-  }
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f5;
+      color: #222;
+      font-size: 13px;
+    }
 
-  h1 {
-    background-color: #005f73;
-    color: white;
-    padding: 24px 32px;
-    font-size: 26px;
-  }
+    /* ── TOP BAR ── */
+    header {
+      background: #003d4d;
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 { font-size: 18px; letter-spacing: 1px; }
+    header span { font-size: 12px; opacity: 0.7; }
 
-  #progressText {
-    background-color: #0a9396;
-    color: white;
-    padding: 10px 32px;
-    font-size: 14px;
-    letter-spacing: 1px;
-  }
+    /* ── MAIN LAYOUT ── */
+    .container {
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+      height: calc(100vh - 48px);
+    }
 
-  form {
-    max-width: 620px;
-    margin: 40px auto;
-    background: white;
-    border-radius: 10px;
-    padding: 36px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  }
+    /* ── LEFT PANEL (form) ── */
+    .form-panel {
+      flex: 1;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-  h2 {
-    color: #005f73;
-    margin-bottom: 20px;
-    margin-top: 10px;
-    border-bottom: 2px solid #e0f0f1;
-    padding-bottom: 8px;
-  }
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #e0e0e0;
+      background: #f7f9fb;
+    }
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #666;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    .tab:hover { color: #003d4d; }
+    .tab.active {
+      color: #003d4d;
+      border-bottom-color: #003d4d;
+      background: white;
+    }
 
-  label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 6px;
-    font-size: 14px;
-    color: #444;
-  }
+    /* ── FORM CONTENT ── */
+    .tab-content {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
 
-  input, select {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 15px;
-    color: #333;
-  }
+    .section-title {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #003d4d;
+      border-bottom: 1px solid #e0e7ea;
+      padding-bottom: 6px;
+      margin-bottom: 14px;
+      margin-top: 20px;
+    }
+    .section-title:first-child { margin-top: 0; }
 
-  input:focus, select:focus {
-    outline: none;
-    border-color: #0a9396;
-    box-shadow: 0 0 0 3px rgba(10,147,150,0.15);
-  }
+    /* ── TWO-COLUMN GRID ── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 20px;
+    }
+    .grid.three { grid-template-columns: 1fr 1fr 1fr; }
+    .grid.full { grid-template-columns: 1fr; }
 
-  button {
-    padding: 13px 28px;
-    border: none;
-    border-radius: 6px;
-    font-size: 15px;
-    cursor: pointer;
-    font-weight: bold;
-  }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field label {
+      font-size: 11px;
+      font-weight: bold;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .field input, .field select {
+      padding: 7px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #222;
+      background: #fff;
+    }
+    .field input:focus, .field select:focus {
+      outline: none;
+      border-color: #0a9396;
+      box-shadow: 0 0 0 2px rgba(10,147,150,0.15);
+    }
+    .field input.error, .field select.error {
+      border-color: #e63946;
+      background: #fff5f5;
+    }
+    .error-msg {
+      color: #e63946;
+      font-size: 11px;
+      margin-top: 2px;
+    }
+    .validation-banner {
+      background: #fff0f0;
+      border: 1px solid #e63946;
+      color: #c1121f;
+      padding: 10px 16px;
+      border-radius: 5px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      display: none;
+    }
 
-  button[onclick*="goToStep(1)"],
-  button[onclick*="goToStep(2)"],
-  button[onclick*="goToStep(3)"] {
-    background-color: #e0e0e0;
-    color: #333;
-    margin-right: 10px;
-  }
+    /* ── RUN QUOTES BUTTON ── */
+    .footer-bar {
+      padding: 12px 20px;
+      border-top: 1px solid #e0e0e0;
+      background: #f7f9fb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .btn-run {
+      background: #003d4d;
+      color: white;
+      border: none;
+      padding: 10px 32px;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+    }
+    .btn-run:hover { background: #005f73; }
+    .btn-clear {
+      background: none;
+      border: 1px solid #ccc;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 13px;
+      cursor: pointer;
+      color: #666;
+    }
+    .btn-clear:hover { background: #f0f0f0; }
 
-  button[onclick*="goToStep(2)"][id],
-  button:last-child {
-    background-color: #005f73;
-    color: white;
-  }
+    /* ── RIGHT PANEL (results) ── */
+    .results-panel {
+      width: 380px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .results-header {
+      background: #003d4d;
+      color: white;
+      padding: 12px 16px;
+      font-weight: bold;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+    .results-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .results-empty {
+      color: #aaa;
+      font-size: 13px;
+      text-align: center;
+      margin-top: 60px;
+      line-height: 1.8;
+    }
 
-  button[onclick="calculateQuote()"] {
-    background-color: #005f73;
-    color: white;
-  }
+    /* ── CARRIER QUOTE CARD ── */
+    .carrier-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 14px;
+      margin-bottom: 12px;
+      transition: box-shadow 0.2s;
+    }
+    .carrier-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .carrier-card.best {
+      border-color: #0a9396;
+      background: #f0fafa;
+    }
+    .carrier-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .carrier-name { font-weight: bold; font-size: 14px; color: #003d4d; }
+    .carrier-price { font-size: 20px; font-weight: bold; color: #003d4d; }
+    .carrier-price span { font-size: 12px; font-weight: normal; color: #888; }
+    .carrier-details { font-size: 12px; color: #666; line-height: 1.8; }
+    .badge-best {
+      background: #0a9396;
+      color: white;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: bold;
+    }
+    .btn-select {
+      width: 100%;
+      margin-top: 10px;
+      padding: 7px;
+      background: #003d4d;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-select:hover { background: #005f73; }
+  </style>
+</head>
+<body>
 
-  #result {
-    max-width: 620px;
-    margin: 20px auto 60px;
-    background: white;
-    border-radius: 10px;
-    padding: 36px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  }
+  <!-- TOP BAR -->
+  <header>
+    <h1>🏢 Agency Rater</h1>
+    <span>Agent Desktop Tool — v1.0</span>
+  </header>
 
-  #result h2 { color: #005f73; margin-bottom: 16px; }
-  #result p { margin-bottom: 10px; font-size: 16px; line-height: 1.6; }
-</style>  </head>
-  <body>
+  <div class="container">
 
-    <h1>Get Your Auto Insurance Quote</h1>
+    <!-- LEFT: FORM PANEL -->
+    <div class="form-panel">
 
-    <!-- Progress indicator -->
-    <p id="progressText">Step 1 of 4 — Getting Started</p>
-
-    <form id="quoteForm">
-
-      <!-- ===== STEP 1: GETTING STARTED ===== -->
-      <div id="step1">
-        <h2>Tell us about yourself</h2>
-
-        <label>First Name</label>
-        <input type="text" id="firstName" placeholder="First Name" /><br /><br />
-
-        <label>Last Name</label>
-        <input type="text" id="lastName" placeholder="Last Name" /><br /><br />
-
-        <label>Suffix</label>
-        <select id="suffix">
-          <option value="">None</option>
-          <option value="jr">Jr.</option>
-          <option value="sr">Sr.</option>
-          <option value="ii">II</option>
-          <option value="iii">III</option>
-        </select><br /><br />
-
-        <label>Date of Birth</label>
-        <input type="date" id="dob" /><br /><br />
-
-        <h2>Where do you live?</h2>
-
-        <label>ZIP Code</label>
-        <input type="text" id="zip" placeholder="23225" maxlength="5" /><br /><br />
-
-        <label>Street Address</label>
-        <input type="text" id="address" placeholder="123 Main St" /><br /><br />
-
-        <label>Apt / Unit (optional)</label>
-        <input type="text" id="apt" placeholder="Apt 4B" /><br /><br />
-
-        <label>Do you:</label><br />
-        <select id="homeType">
-          <option value="">-- Select --</option>
-          <option value="own">Own Home</option>
-          <option value="rent">Rent</option>
-          <option value="condo">Own Condo</option>
-          <option value="mobile">Own Mobile Home</option>
-          <option value="parents">Live with Parents / Other</option>
-        </select><br /><br />
-
-        <label>When did you move in?</label><br />
-        <select id="moveMonth">
-          <option value="">Month</option>
-          <option value="1">January</option>
-          <option value="2">February</option>
-          <option value="3">March</option>
-          <option value="4">April</option>
-          <option value="5">May</option>
-          <option value="6">June</option>
-          <option value="7">July</option>
-          <option value="8">August</option>
-          <option value="9">September</option>
-          <option value="10">October</option>
-          <option value="11">November</option>
-          <option value="12">December</option>
-        </select>
-        <select id="moveYear">
-          <option value="">Year</option>
-          <option value="2024">2024</option>
-          <option value="2023">2023</option>
-          <option value="2022">2022</option>
-          <option value="2021">2021</option>
-          <option value="2020">2020</option>
-          <option value="2019">2019</option>
-          <option value="2018">2018</option>
-          <option value="2015">2015</option>
-          <option value="2010">2010</option>
-          <option value="2005">2005</option>
-          <option value="2000">2000</option>
-        </select><br /><br />
-
-        <button type="button" onclick="goToStep(2)">Save and Continue →</button>
+      <!-- TABS -->
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('applicant')">Applicant</div>
+        <div class="tab" onclick="switchTab('vehicle')">Vehicle</div>
+        <div class="tab" onclick="switchTab('drivers')">Drivers</div>
+        <div class="tab" onclick="switchTab('coverage')">Coverage</div>
       </div>
 
-      <!-- ===== STEP 2: VEHICLES ===== -->
-      <div id="step2" style="display:none;">
-        <h2>Tell us about your vehicle</h2>
+      <!-- FORM CONTENT -->
+      <div class="tab-content">
 
-        <label>Vehicle Year</label>
-        <input type="number" id="vehicleYear" placeholder="2020" min="1990" max="2025" /><br /><br />
+        <!-- APPLICANT TAB -->
+        <div class="tab-pane active" id="tab-applicant">
+          <div class="section-title">Personal Information</div>
+          <div class="grid three">
+            <div class="field">
+              <label>First Name</label>
+              <input type="text" id="firstName" placeholder="First Name" />
+            </div>
+            <div class="field">
+              <label>Last Name</label>
+              <input type="text" id="lastName" placeholder="Last Name" />
+            </div>
+            <div class="field">
+              <label>Suffix</label>
+              <select id="suffix">
+                <option value="">None</option>
+                <option>Jr.</option>
+                <option>Sr.</option>
+                <option>II</option>
+                <option>III</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Date of Birth</label>
+              <input type="date" id="dob" />
+            </div>
+            <div class="field">
+              <label>Gender</label>
+              <select id="gender">
+                <option value="">Select</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Non-binary</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Marital Status</label>
+              <select id="maritalStatus">
+                <option value="">Select</option>
+                <option>Single</option>
+                <option>Married</option>
+                <option>Divorced</option>
+                <option>Widowed</option>
+              </select>
+            </div>
+          </div>
 
-        <label>Vehicle Make</label>
-        <input type="text" id="vehicleMake" placeholder="e.g. Toyota" /><br /><br />
+          <div class="section-title">Address</div>
+          <div class="grid">
+            <div class="field">
+              <label>Street Address</label>
+              <input type="text" id="address" />
+            </div>
+            <div class="field">
+              <label>Apt / Unit</label>
+              <input type="text" id="apt" placeholder="Optional" />
+            </div>
+            <div class="field">
+              <label>City</label>
+              <input type="text" id="city"  />
+            </div>
+            <div class="field">
+              <label>State</label>
+              <select id="state">
+                <option value="">Select</option>
+                <option>VA</option>
+                <option>TX</option>
+                <option>TN</option>
+                <option>IN</option>
+                <option>IL</option>
+                <option>OH</option>
+                <option>GA</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>ZIP Code</label>
+              <input type="text" id="zip"  maxlength="5" />
+            </div>
+            <div class="field">
+              <label>Residence Type</label>
+              <select id="homeType">
+                <option value="">Select</option>
+                <option>Own Home</option>
+                <option>Rent</option>
+                <option>Own Condo</option>
+                <option>Own Mobile Home</option>
+                <option>Live with Parents</option>
+              </select>
+            </div>
+          </div>
 
-        <label>Vehicle Model</label>
-        <input type="text" id="vehicleModel" placeholder="e.g. Camry" /><br /><br />
-
-        <label>Vehicle Trim / Sub-model</label>
-        <input type="text" id="vehicleTrim" placeholder="e.g. LE, XLE, SE" /><br /><br />
-
-        <label>Primary Use</label>
-        <select id="vehicleUse">
-          <option value="">-- Select --</option>
-          <option value="commute">Commute to Work/School</option>
-          <option value="pleasure">Pleasure / Personal Use</option>
-          <option value="business">Business</option>
-          <option value="farm">Farm</option>
-        </select><br /><br />
-
-        <label>Estimated Annual Mileage</label>
-        <select id="annualMileage">
-          <option value="">-- Select --</option>
-          <option value="5000">Under 5,000</option>
-          <option value="7500">5,000 – 7,500</option>
-          <option value="10000">7,500 – 10,000</option>
-          <option value="12500">10,000 – 12,500</option>
-          <option value="15000">12,500 – 15,000</option>
-          <option value="20000">15,000 – 20,000</option>
-          <option value="25000">Over 20,000</option>
-        </select><br /><br />
-
-        <label>Vehicle Ownership</label>
-        <select id="vehicleOwnership">
-          <option value="">-- Select --</option>
-          <option value="own">Own (paid off)</option>
-          <option value="finance">Financing</option>
-          <option value="lease">Leasing</option>
-        </select><br /><br />
-
-        <label>Anti-theft device installed?</label>
-        <select id="antiTheft">
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
-        </select><br /><br />
-
-        <button type="button" onclick="goToStep(1)">← Back</button>
-        <button type="button" onclick="goToStep(3)">Save and Continue →</button>
-      </div>
-
-      <!-- ===== STEP 3: DRIVERS ===== -->
-      <div id="step3" style="display:none;">
-        <h2>Tell us about the drivers</h2>
-
-        <label>Gender</label>
-        <select id="gender">
-          <option value="">-- Select --</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="nonbinary">Non-binary / Other</option>
-        </select><br /><br />
-
-        <label>Marital Status</label>
-        <select id="maritalStatus">
-          <option value="">-- Select --</option>
-          <option value="single">Single</option>
-          <option value="married">Married</option>
-          <option value="divorced">Divorced</option>
-          <option value="widowed">Widowed</option>
-        </select><br /><br />
-
-        <label>Driver's License State</label>
-        <select id="licenseState">
-          <option value="">-- Select --</option>
-          <option value="VA">Virginia</option>
-          <option value="TX">Texas</option>
-          <option value="TN">Tennessee</option>
-          <option value="IN">Indiana</option>
-          <option value="IL">Illinois</option>
-          <option value="OH">Ohio</option>
-          <option value="GA">Georgia</option>
-        </select><br /><br />
-
-        <label>Age First Licensed</label>
-        <input type="number" id="ageLicensed" placeholder="16" min="14" max="30" /><br /><br />
-
-        <label>Any violations or accidents in the last 5 years?</label>
-        <select id="violations">
-          <option value="none">None</option>
-          <option value="ticket">Speeding Ticket</option>
-          <option value="accident">At-Fault Accident</option>
-          <option value="dui">DUI / DWI</option>
-          <option value="multiple">Multiple Incidents</option>
-        </select><br /><br />
-
-        <label>Good student discount? (Under 25 with B average or better)</label>
-        <select id="goodStudent">
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
-        </select><br /><br />
-
-        <label>Currently insured?</label>
-        <select id="currentlyInsured" onchange="toggleInsuranceFields()">
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select><br /><br />
-
-        <div id="insuranceFields">
-          <label>Current Insurance Carrier</label>
-          <input type="text" id="currentCarrier" placeholder="e.g. Geico, State Farm" /><br /><br />
-
-          <label>How long with current carrier?</label>
-          <select id="yearsInsured">
-            <option value="">-- Select --</option>
-            <option value="less1">Less than 1 year</option>
-            <option value="1-2">1 – 2 years</option>
-            <option value="3-5">3 – 5 years</option>
-            <option value="6+">6+ years</option>
-          </select><br /><br />
+          <div class="section-title">Contact</div>
+          <div class="grid">
+            <div class="field">
+              <label>Email</label>
+              <input type="email" id="email" />
+            </div>
+            <div class="field">
+              <label>Phone</label>
+              <input type="tel" id="phone"/>
+            </div>
+          </div>
         </div>
 
-        <button type="button" onclick="goToStep(2)">← Back</button>
-        <button type="button" onclick="goToStep(4)">Save and Continue →</button>
+        <!-- VEHICLE TAB -->
+        <div class="tab-pane" id="tab-vehicle">
+          <div class="section-title">Vehicle Information</div>
+          <div class="grid three">
+            <div class="field">
+              <label>Year</label>
+              <input type="number" id="vehicleYear" min="1981" max="2026" />
+            </div>
+            <div class="field">
+              <label>Make</label>
+              <input type="text" id="vehicleMake"/>
+            </div>
+            <div class="field">
+              <label>Model</label>
+              <input type="text" id="vehicleModel"/>
+            </div>
+            <div class="field">
+              <label>Trim</label>
+              <input type="text" id="vehicleTrim" placeholder="LE, XLE, SE..." />
+            </div>
+            <div class="field">
+              <label>VIN</label>
+              <input type="text" id="vin" />
+            </div>
+            <div class="field">
+              <label>Ownership</label>
+              <select id="vehicleOwnership">
+                <option value="">Select</option>
+                <option>Owned</option>
+                <option>Financed</option>
+                <option>Leased</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="section-title">Usage</div>
+          <div class="grid">
+            <div class="field">
+              <label>Primary Use</label>
+              <select id="vehicleUse">
+                <option value="">Select</option>
+                <option>Commute</option>
+                <option>Pleasure</option>
+                <option>Business</option>
+                <option>Farm</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Annual Mileage</label>
+              <select id="annualMileage">
+                <option value="">Select</option>
+                <option value="5000">Under 5,000</option>
+                <option value="7500">5,000 – 7,500</option>
+                <option value="10000">7,500 – 10,000</option>
+                <option value="12500">10,000 – 12,500</option>
+                <option value="15000">12,500 – 15,000</option>
+                <option value="20000">15,000 – 20,000</option>
+                <option value="25000">Over 20,000</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Anti-Theft Device</label>
+              <select id="antiTheft">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+ <div class="field">
+              <label>Garaging ZIP</label>
+              <select id="garagingZipSelect" onchange="handleGaragingZip()">
+                <option value="">Select</option>
+                <option id="garagingZipSame" value="same">Same as Applicant ZIP</option>
+                <option value="other">Other — Enter Manually</option>
+              </select>
+              <input type="text" id="garagingZipManual" maxlength="5"
+                placeholder="Enter ZIP"
+                style="display:none; margin-top:6px;" />
+            </div>
+          </div>
+        </div>
+
+        <!-- DRIVERS TAB -->
+        <div class="tab-pane" id="tab-drivers">
+          <div class="section-title">Primary Driver</div>
+          <div class="grid">
+            <div class="field">
+              <label>License State</label>
+              <select id="licenseState">
+                <option value="">Select</option>
+                <option>VA</option>
+                <option>TX</option>
+                <option>TN</option>
+                <option>IN</option>
+                <option>IL</option>
+                <option>OH</option>
+                <option>GA</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Age First Licensed</label>
+              <input type="number" id="ageLicensed" placeholder="16" min="14" max="99" />
+            </div>
+            <div class="field">
+              <label>Violations (last 5 yrs)</label>
+              <select id="violations">
+                <option value="none">None</option>
+                <option value="ticket">Speeding Ticket</option>
+                <option value="accident">At-Fault Accident</option>
+                <option value="dui">DUI / DWI</option>
+                <option value="multiple">Multiple Incidents</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>SR-22 Required?</label>
+              <select id="sr22">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Good Student Discount?</label>
+              <select id="goodStudent">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Defensive Driver Course?</label>
+              <select id="defensiveDriving">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="section-title">Current Insurance</div>
+          <div class="grid">
+            <div class="field">
+              <label>Currently Insured?</label>
+              <select id="currentlyInsured">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Current Carrier</label>
+              <input type="text" id="currentCarrier" placeholder="e.g. Elephant Insurance" />
+            </div>
+            <div class="field">
+              <label>Years with Carrier</label>
+              <select id="yearsInsured">
+                <option value="">Select</option>
+                <option value="less1">Less than 1 yr</option>
+                <option value="1-2">1 – 2 yrs</option>
+                <option value="3-5">3 – 5 yrs</option>
+                <option value="6+">6+ yrs</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Reason for Shopping</label>
+              <select id="shoppingReason">
+                <option value="">Select</option>
+                <option>Price</option>
+                <option>Coverage</option>
+                <option>New Vehicle</option>
+                <option>Life Change</option>
+                <option>Renewal</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- COVERAGE TAB -->
+        <div class="tab-pane" id="tab-coverage">
+          <div class="section-title">Liability</div>
+          <div class="grid">
+            <div class="field">
+              <label>Bodily Injury Limits</label>
+              <select id="liability">
+                <option value="25/50">25/50 — State Minimum</option>
+                <option value="50/100">50/100</option>
+                <option value="100/300" selected>100/300 — Recommended</option>
+                <option value="250/500">250/500</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Property Damage</label>
+              <select id="propertyDamage">
+                <option value="25000">$25,000</option>
+                <option value="50000" selected>$50,000</option>
+                <option value="100000">$100,000</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Uninsured Motorist</label>
+              <select id="umUim">
+                <option value="none">None</option>
+                <option value="25/50">25/50</option>
+                <option value="50/100" selected>50/100</option>
+                <option value="100/300">100/300</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Medical Payments</label>
+              <select id="medPay">
+                <option value="none">None</option>
+                <option value="1000">$1,000</option>
+                <option value="2000">$2,000</option>
+                <option value="5000">$5,000</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="section-title">Physical Damage</div>
+          <div class="grid">
+            <div class="field">
+              <label>Comprehensive Deductible</label>
+              <select id="compDeductible">
+                <option value="none">No Coverage</option>
+                <option value="250">$250</option>
+                <option value="500" selected>$500</option>
+                <option value="1000">$1,000</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Collision Deductible</label>
+              <select id="collDeductible">
+                <option value="none">No Coverage</option>
+                <option value="250">$250</option>
+                <option value="500" selected>$500</option>
+                <option value="1000">$1,000</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="section-title">Add-ons</div>
+          <div class="grid">
+            <div class="field">
+              <label>Roadside Assistance</label>
+              <select id="roadside">
+                <option value="no">No</option>
+                <option value="yes">Yes (+$5/mo)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Rental Car Coverage</label>
+              <select id="rental">
+                <option value="no">No</option>
+                <option value="yes">Yes (+$4/mo)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Accident Forgiveness</label>
+              <select id="accidentForgiveness">
+                <option value="no">No</option>
+                <option value="yes">Yes (+$8/mo)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>New Car Replacement</label>
+              <select id="newCarReplacement">
+                <option value="no">No</option>
+                <option value="yes">Yes (+$10/mo)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="section-title">Effective Date</div>
+          <div class="grid">
+            <div class="field">
+              <label>Requested Effective Date</label>
+              <input type="date" id="effectiveDate" />
+            </div>
+            <div class="field">
+              <label>Payment Plan</label>
+              <select id="paymentPlan">
+                <option value="monthly">Monthly</option>
+                <option value="paid-in-full">Paid in Full (5% discount)</option>
+                <option value="semi-annual">Semi-Annual</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end tab-content -->
+
+      <!-- FOOTER BAR -->
+      <div class="footer-bar">
+        <button class="btn-clear" onclick="clearForm()">Clear Form</button>
+        <button class="btn-run" onclick="runQuotes()">⚡ Run Quotes</button>
       </div>
 
-      <!-- ===== STEP 4: YOUR QUOTE ===== -->
-      <div id="step4" style="display:none;">
-        <h2>Almost there! Contact details</h2>
+    </div><!-- end form-panel -->
 
-        <label>Email Address</label>
-        <input type="email" id="email" placeholder="you@example.com" /><br /><br />
-
-        <label>Phone Number</label>
-        <input type="tel" id="phone" placeholder="(804) 555-1234" /><br /><br />
-
-        <h2>Select Your Coverage</h2>
-
-        <label>Liability Limits</label>
-        <select id="liability">
-          <option value="25/50">25/50 (State Minimum)</option>
-          <option value="50/100">50/100</option>
-          <option value="100/300">100/300 (Recommended)</option>
-          <option value="250/500">250/500</option>
-        </select><br /><br />
-
-        <label>Comprehensive Deductible</label>
-        <select id="compDeductible">
-          <option value="none">No Coverage</option>
-          <option value="250">$250</option>
-          <option value="500">$500</option>
-          <option value="1000">$1,000</option>
-        </select><br /><br />
-
-        <label>Collision Deductible</label>
-        <select id="collDeductible">
-          <option value="none">No Coverage</option>
-          <option value="250">$250</option>
-          <option value="500">$500</option>
-          <option value="1000">$1,000</option>
-        </select><br /><br />
-
-        <label>Roadside Assistance?</label>
-        <select id="roadside">
-          <option value="no">No</option>
-          <option value="yes">Yes (+$5/mo)</option>
-        </select><br /><br />
-
-        <label>Rental Car Coverage?</label>
-        <select id="rental">
-          <option value="no">No</option>
-          <option value="yes">Yes (+$4/mo)</option>
-        </select><br /><br />
-
-        <button type="button" onclick="goToStep(3)">← Back</button>
-        <button type="button" onclick="calculateQuote()">Get My Quote →</button>
+    <!-- RIGHT: RESULTS PANEL -->
+    <div class="results-panel">
+      <div class="results-header">📋 Quote Results</div>
+      <div class="results-body" id="resultsBody">
+        <div class="results-empty">
+          Fill out applicant information<br />and click <strong>Run Quotes</strong><br />to see carrier results.
+        </div>
       </div>
+    </div>
 
-    </form>
+  </div><!-- end container -->
 
-    <!-- Quote Result -->
-    <div id="result"></div>
+  <script>
+   // Tab switching
+    function switchTab(name) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      event.target.classList.add('active');
+    }
 
-    <script>
-      const stepTitles = [
-        "", 
-        "Step 1 of 4 — Getting Started",
-        "Step 2 of 4 — Your Vehicle",
-        "Step 3 of 4 — Drivers",
-        "Step 4 of 4 — Your Quote"
+    // Smart garaging ZIP
+    function handleGaragingZip() {
+      const sel = document.getElementById('garagingZipSelect').value;
+      const manual = document.getElementById('garagingZipManual');
+      if (sel === 'other') {
+        manual.style.display = 'block';
+        manual.focus();
+      } else {
+        manual.style.display = 'none';
+      }
+    }
+
+    // Update garaging ZIP dropdown when applicant ZIP changes
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('zip').addEventListener('input', function() {
+        const opt = document.getElementById('garagingZipSame');
+        if (this.value.length === 5) {
+          opt.textContent = `Same as Applicant ZIP (${this.value})`;
+        } else {
+          opt.textContent = 'Same as Applicant ZIP';
+        }
+      });
+    });
+
+    // Validation
+    function validate() {
+      let valid = true;
+      const required = [
+        { id: 'firstName', tab: 'applicant', label: 'First Name' },
+        { id: 'lastName', tab: 'applicant', label: 'Last Name' },
+        { id: 'dob', tab: 'applicant', label: 'Date of Birth' },
+        { id: 'zip', tab: 'applicant', label: 'ZIP Code' },
+        { id: 'state', tab: 'applicant', label: 'State' },
+        { id: 'homeType', tab: 'applicant', label: 'Residence Type' },
+        { id: 'vehicleYear', tab: 'vehicle', label: 'Vehicle Year' },
+        { id: 'vehicleMake', tab: 'vehicle', label: 'Vehicle Make' },
+        { id: 'vehicleModel', tab: 'vehicle', label: 'Vehicle Model' },
+        { id: 'vehicleOwnership', tab: 'vehicle', label: 'Vehicle Ownership' },
+        { id: 'vehicleUse', tab: 'vehicle', label: 'Primary Use' },
+        { id: 'annualMileage', tab: 'vehicle', label: 'Annual Mileage' },
+        { id: 'licenseState', tab: 'drivers', label: 'License State' },
       ];
 
-      function goToStep(step) {
-        // Hide all steps
-        document.getElementById("step1").style.display = "none";
-        document.getElementById("step2").style.display = "none";
-        document.getElementById("step3").style.display = "none";
-        document.getElementById("step4").style.display = "none";
-        // Show selected step
-        document.getElementById("step" + step).style.display = "block";
-        document.getElementById("progressText").textContent = stepTitles[step];
-        window.scrollTo(0, 0);
+      // Clear previous errors
+      document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
+      document.querySelectorAll('.error-msg').forEach(e => e.remove());
+
+      const errorFields = [];
+
+      required.forEach(f => {
+        const el = document.getElementById(f.id);
+        if (!el.value || el.value.trim() === '') {
+          el.classList.add('error');
+          const msg = document.createElement('div');
+          msg.className = 'error-msg';
+          msg.textContent = `${f.label} is required`;
+          el.parentNode.appendChild(msg);
+          errorFields.push({ ...f, el });
+          valid = false;
+        }
+      });
+
+      // Show banner if errors
+      let banner = document.getElementById('validationBanner');
+      if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'validationBanner';
+        banner.className = 'validation-banner';
+        document.querySelector('.tab-content').prepend(banner);
       }
 
-      function toggleInsuranceFields() {
-        const insured = document.getElementById("currentlyInsured").value;
-        document.getElementById("insuranceFields").style.display = 
-          insured === "yes" ? "block" : "none";
+      if (!valid) {
+        const tabs = {};
+        errorFields.forEach(f => {
+          if (!tabs[f.tab]) tabs[f.tab] = [];
+          tabs[f.tab].push(f.label);
+        });
+        const tabNames = { applicant: 'Applicant', vehicle: 'Vehicle', drivers: 'Drivers', coverage: 'Coverage' };
+        let msg = '⚠️ Please complete required fields: ';
+        msg += Object.entries(tabs).map(([tab, fields]) =>
+          `<strong>${tabNames[tab]}</strong> (${fields.join(', ')})`
+        ).join(' — ');
+        banner.innerHTML = msg;
+        banner.style.display = 'block';
+
+        // Jump to first tab with errors
+        const firstErrorTab = errorFields[0].tab;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        document.getElementById('tab-' + firstErrorTab).classList.add('active');
+        document.querySelector(`.tab[onclick="switchTab('${firstErrorTab}')"]`).classList.add('active');
+      } else {
+        banner.style.display = 'none';
       }
 
-      function calculateQuote() {
-        // Base rate by coverage
-        let base = 80;
+      return valid;
+    }
 
-        // Age factor
-        const dob = new Date(document.getElementById("dob").value);
-        const age = Math.floor((new Date() - dob) / (365.25 * 24 * 60 * 60 * 1000));
-        if (age < 25) base += 40;
-        else if (age > 65) base += 15;
-
-        // Violations
-        const violations = document.getElementById("violations").value;
-        if (violations === "ticket") base += 20;
-        else if (violations === "accident") base += 35;
-        else if (violations === "dui") base += 75;
-        else if (violations === "multiple") base += 90;
-
-        // Home ownership discount
-        if (document.getElementById("homeType").value === "own") base -= 10;
-
-        // Vehicle ownership
-        const ownership = document.getElementById("vehicleOwnership").value;
-        if (ownership === "finance" || ownership === "lease") base += 10;
-
-        // Mileage
-        const miles = parseInt(document.getElementById("annualMileage").value) || 10000;
-        if (miles > 15000) base += 15;
-
-        // Liability level
-        const liability = document.getElementById("liability").value;
-        if (liability === "50/100") base += 10;
-        else if (liability === "100/300") base += 22;
-        else if (liability === "250/500") base += 40;
-
-        // Comp/collision
-        const comp = document.getElementById("compDeductible").value;
-        const coll = document.getElementById("collDeductible").value;
-        if (comp !== "none") base += comp === "250" ? 20 : comp === "500" ? 14 : 8;
-        if (coll !== "none") base += coll === "250" ? 25 : coll === "500" ? 18 : 10;
-
-        // Add-ons
-        if (document.getElementById("roadside").value === "yes") base += 5;
-        if (document.getElementById("rental").value === "yes") base += 4;
-
-        // Anti-theft discount
-        if (document.getElementById("antiTheft").value === "yes") base -= 5;
-
-        // Good student discount
-        if (document.getElementById("goodStudent").value === "yes") base -= 8;
-
-        const name = document.getElementById("firstName").value || "there";
-
-        document.getElementById("result").innerHTML = `
-          <hr />
-          <h2>🎉 Your Quote, ${name}!</h2>
-          <p><strong>Estimated Monthly Premium:</strong> $${base}.00/mo</p>
-          <p><strong>Coverage Selected:</strong> ${document.getElementById("liability").value} Liability</p>
-          <p><strong>Vehicle:</strong> ${document.getElementById("vehicleYear").value} 
-             ${document.getElementById("vehicleMake").value} 
-             ${document.getElementById("vehicleModel").value}</p>
-          <p><em>This is a learning demo — not a real insurance quote!</em></p>
-        `;
+    // Clear form
+    function clearForm() {
+      if (confirm('Clear all fields?')) {
+        document.querySelectorAll('input').forEach(i => i.value = '');
+        document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+        document.getElementById('garagingZipManual').style.display = 'none';
+        document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
+        document.querySelectorAll('.error-msg').forEach(e => e.remove());
+        const banner = document.getElementById('validationBanner');
+        if (banner) banner.style.display = 'none';
+        document.getElementById('resultsBody').innerHTML =
+          '<div class="results-empty">Fill out applicant information<br />and click <strong>Run Quotes</strong><br />to see carrier results.</div>';
       }
-    </script>
+    }
 
-  </body>
+    // Run Quotes
+    function runQuotes() {
+      if (!validate()) return;
+
+      const dob = new Date(document.getElementById('dob').value);
+      const age = dob ? Math.floor((new Date() - dob) / (365.25*24*60*60*1000)) : 35;
+      const violations = document.getElementById('violations').value;
+      const homeType = document.getElementById('homeType').value;
+      const mileage = parseInt(document.getElementById('annualMileage').value) || 12000;
+      const ownership = document.getElementById('vehicleOwnership').value;
+      const liability = document.getElementById('liability').value;
+      const comp = document.getElementById('compDeductible').value;
+      const coll = document.getElementById('collDeductible').value;
+      const roadside = document.getElementById('roadside').value;
+      const rental = document.getElementById('rental').value;
+      const accForgiveness = document.getElementById('accidentForgiveness').value;
+      const newCar = document.getElementById('newCarReplacement').value;
+      const goodStudent = document.getElementById('goodStudent').value;
+      const defensiveDriving = document.getElementById('defensiveDriving').value;
+      const antiTheft = document.getElementById('antiTheft').value;
+      const paymentPlan = document.getElementById('paymentPlan').value;
+      const sr22 = document.getElementById('sr22').value;
+
+      function calcBase(carrierBase) {
+        let b = carrierBase;
+        if (age < 25) b += 45;
+        else if (age < 30) b += 20;
+        else if (age > 70) b += 18;
+        if (violations === 'ticket') b += 22;
+        else if (violations === 'accident') b += 40;
+        else if (violations === 'dui') b += 85;
+        else if (violations === 'multiple') b += 100;
+        if (sr22 === 'yes') b += 30;
+        if (homeType === 'Own Home' || homeType === 'Own Condo') b -= 8;
+        if (mileage > 15000) b += 15;
+        if (ownership === 'Financed' || ownership === 'Leased') b += 10;
+        if (liability === '50/100') b += 10;
+        else if (liability === '100/300') b += 22;
+        else if (liability === '250/500') b += 42;
+        if (comp !== 'none') b += comp === '250' ? 20 : comp === '500' ? 13 : 7;
+        if (coll !== 'none') b += coll === '250' ? 25 : coll === '500' ? 17 : 9;
+        if (roadside === 'yes') b += 5;
+        if (rental === 'yes') b += 4;
+        if (accForgiveness === 'yes') b += 8;
+        if (newCar === 'yes') b += 10;
+        if (goodStudent === 'yes') b -= 8;
+        if (defensiveDriving === 'yes') b -= 6;
+        if (antiTheft === 'yes') b -= 5;
+        if (paymentPlan === 'paid-in-full') b = Math.round(b * 0.95);
+        return Math.max(b, 40);
+      }
+
+      const carriers = [
+        { name: 'Carrier A — Bristol West', base: 78, color: '#1a6b8a' },
+        { name: 'Carrier B — Progressive', base: 85, color: '#0077c8' },
+        { name: 'Carrier C — Nationwide', base: 92, color: '#004b87' },
+        { name: 'Carrier D — Safeco', base: 88, color: '#c8392b' },
+      ];
+
+      const results = carriers.map(c => ({
+        name: c.name,
+        color: c.color,
+        monthly: calcBase(c.base),
+      })).sort((a, b) => a.monthly - b.monthly);
+
+      const name = document.getElementById('firstName').value;
+      const vehicle = `${document.getElementById('vehicleYear').value} ${document.getElementById('vehicleMake').value} ${document.getElementById('vehicleModel').value}`.trim();
+
+      let html = `<div style="font-size:12px;color:#888;margin-bottom:12px;">
+        Applicant: <strong>${name} ${document.getElementById('lastName').value}</strong><br>
+        Vehicle: <strong>${vehicle}</strong><br>
+        Coverage: <strong>${liability} BI</strong> &nbsp;|&nbsp; Comp/Coll: <strong>${comp}/${coll}</strong>
+      </div>`;
+
+      results.forEach((r, i) => {
+        html += `
+          <div class="carrier-card ${i === 0 ? 'best' : ''}">
+            <div class="carrier-top">
+              <div class="carrier-name" style="color:${r.color}">${r.name}</div>
+              ${i === 0 ? '<span class="badge-best">LOWEST</span>' : ''}
+            </div>
+            <div class="carrier-price">$${r.monthly}<span>/mo</span></div>
+            <div class="carrier-details">
+              6-month premium: <strong>$${r.monthly * 6}</strong><br>
+              Liability: ${liability} &nbsp;|&nbsp; Comp: ${comp} &nbsp;|&nbsp; Coll: ${coll}
+            </div>
+            <button class="btn-select">Select This Quote →</button>
+          </div>`;
+      });
+
+      document.getElementById('resultsBody').innerHTML = html;
+    }
+  </script>
+
+</body>
 </html>
