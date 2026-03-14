@@ -370,6 +370,67 @@
     .notepad:focus { outline: none; border-color: #0a9396; }
     .notepad-actions { display: flex; justify-content: flex-end; margin-top: 8px; gap: 8px; }
 
+    /* ═══════════════════════════════════════
+       LOGIN / SETUP SCREENS
+    ═══════════════════════════════════════ */
+    .auth-screen {
+      display: none;
+      position: fixed; inset: 0;
+      background: #0f172a;
+      z-index: 9000;
+      align-items: center; justify-content: center;
+      flex-direction: column;
+    }
+    .auth-screen.visible { display: flex; }
+
+    .auth-card {
+      background: white;
+      border-radius: 14px;
+      padding: 40px 44px;
+      width: 420px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+      text-align: center;
+    }
+    .auth-logo { font-size: 26px; font-weight: 800; color: #1a2332; margin-bottom: 4px; letter-spacing: -0.5px; }
+    .auth-logo span { color: #0a9396; }
+    .auth-tagline { font-size: 12px; color: #9ca3af; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 28px; }
+    .auth-heading { font-size: 18px; font-weight: 700; color: #1a2332; margin-bottom: 6px; }
+    .auth-sub { font-size: 13px; color: #6b7280; margin-bottom: 24px; line-height: 1.5; }
+
+    .auth-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; text-align: left; }
+    .auth-field label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #374151; }
+    .auth-field input {
+      padding: 10px 14px; border: 1.5px solid #e4e7ec; border-radius: 7px;
+      font-size: 14px; color: #1a2332; background: #f9fafb;
+      transition: border-color 0.2s;
+    }
+    .auth-field input:focus { outline: none; border-color: #0a9396; background: white; box-shadow: 0 0 0 3px rgba(10,147,150,0.1); }
+    .auth-field input.shake { animation: shake 0.4s; border-color: #ef4444; background: #fef2f2; }
+
+    .btn-auth {
+      width: 100%; padding: 12px; background: #0a9396; color: white;
+      border: none; border-radius: 7px; font-size: 14px; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.3px; margin-top: 6px;
+      transition: background 0.15s;
+    }
+    .btn-auth:hover { background: #007f82; }
+
+    .auth-divider { height: 1px; background: #f3f4f6; margin: 20px 0; }
+    .auth-reset { font-size: 12px; color: #9ca3af; cursor: pointer; }
+    .auth-reset:hover { color: #ef4444; text-decoration: underline; }
+    .auth-welcome-name { color: #0a9396; }
+    .auth-error { color: #ef4444; font-size: 12px; margin-top: 8px; display: none; }
+
+    .passcode-dots { display: flex; justify-content: center; gap: 10px; margin: 18px 0 10px; }
+    .dot { width: 14px; height: 14px; border-radius: 50%; background: #e4e7ec; transition: background 0.15s; }
+    .dot.filled { background: #0a9396; }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%,60%  { transform: translateX(-6px); }
+      40%,80%  { transform: translateX(6px); }
+    }
+
     /* Scrollbar */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: #f0f2f5; }
@@ -392,6 +453,43 @@
   </style>
 </head>
 <body>
+
+  <!-- ═══ SETUP SCREEN (first time) ═══ -->
+  <div class="auth-screen" id="setupScreen">
+    <div class="auth-card">
+      <div class="auth-logo">Agent<span>Desk</span></div>
+      <div class="auth-tagline">Insurance Agent Portal</div>
+      <div class="auth-heading">Welcome! Let's set up your portal.</div>
+      <div class="auth-sub">This only takes a moment. Your info is stored locally on this device.</div>
+      <div class="auth-field"><label>Your First Name</label><input type="text" id="setup-name" placeholder="e.g. Karissa" /></div>
+      <div class="auth-field"><label>Agency Name</label><input type="text" id="setup-agency" placeholder="e.g. Karissa Griffin Insurance" /></div>
+      <div class="auth-field"><label>Create a Passcode <span style="font-weight:400;color:#9ca3af">(4–8 characters)</span></label><input type="password" id="setup-pass" placeholder="Choose a passcode" /></div>
+      <div class="auth-field"><label>Confirm Passcode</label><input type="password" id="setup-pass2" placeholder="Repeat passcode" /></div>
+      <button class="btn-auth" onclick="completeSetup()">Get Started →</button>
+      <div class="auth-error" id="setup-error"></div>
+    </div>
+  </div>
+
+  <!-- ═══ LOGIN SCREEN (returning) ═══ -->
+  <div class="auth-screen" id="loginScreen">
+    <div class="auth-card">
+      <div class="auth-logo">Agent<span>Desk</span></div>
+      <div class="auth-tagline">Insurance Agent Portal</div>
+      <div class="auth-heading">Welcome back, <span class="auth-welcome-name" id="loginName"></span> 👋</div>
+      <div class="auth-sub">Enter your passcode to access your portal.</div>
+      <div class="passcode-dots" id="passcodeDots">
+        <div class="dot" id="dot0"></div>
+        <div class="dot" id="dot1"></div>
+        <div class="dot" id="dot2"></div>
+        <div class="dot" id="dot3"></div>
+      </div>
+      <div class="auth-field"><input type="password" id="login-pass" placeholder="Enter passcode" oninput="updateDots()" onkeydown="if(event.key==='Enter') attemptLogin()" autofocus /></div>
+      <button class="btn-auth" onclick="attemptLogin()">Sign In →</button>
+      <div class="auth-error" id="login-error">Incorrect passcode. Please try again.</div>
+      <div class="auth-divider"></div>
+      <div class="auth-reset" onclick="resetSetup()">Not you, or forgot passcode? Reset setup</div>
+    </div>
+  </div>
 
   <!-- ═══ SIDEBAR ═══ -->
   <nav class="sidebar">
@@ -1678,10 +1776,97 @@
     }
 
     // ════════════════════════════════════
+    // AUTH — SETUP & LOGIN
+    // ════════════════════════════════════
+    let sessionAuthenticated = false;
+
+    function initAuth() {
+      const setupDone = localStorage.getItem('agentdesk_setup');
+      if (!setupDone) {
+        document.getElementById('setupScreen').classList.add('visible');
+        setTimeout(() => document.getElementById('setup-name').focus(), 100);
+      } else {
+        const profile = JSON.parse(setupDone);
+        document.getElementById('loginName').textContent = profile.name;
+        document.getElementById('loginScreen').classList.add('visible');
+        setTimeout(() => document.getElementById('login-pass').focus(), 100);
+      }
+    }
+
+    function completeSetup() {
+      const name   = document.getElementById('setup-name').value.trim();
+      const agency = document.getElementById('setup-agency').value.trim();
+      const pass   = document.getElementById('setup-pass').value;
+      const pass2  = document.getElementById('setup-pass2').value;
+      const err    = document.getElementById('setup-error');
+      err.style.display = 'none';
+      if (!name)               { showSetupError('Please enter your name.'); return; }
+      if (!agency)             { showSetupError('Please enter your agency name.'); return; }
+      if (pass.length < 4)     { showSetupError('Passcode must be at least 4 characters.'); return; }
+      if (pass !== pass2)      { showSetupError('Passcodes do not match.'); return; }
+      localStorage.setItem('agentdesk_setup', JSON.stringify({ name, agency, pass }));
+      document.getElementById('setupScreen').classList.remove('visible');
+      applyProfile(name, agency);
+      sessionAuthenticated = true;
+    }
+
+    function showSetupError(msg) {
+      const err = document.getElementById('setup-error');
+      err.textContent = msg;
+      err.style.display = 'block';
+    }
+
+    function attemptLogin() {
+      const profile = JSON.parse(localStorage.getItem('agentdesk_setup') || '{}');
+      const entered = document.getElementById('login-pass').value;
+      const errEl   = document.getElementById('login-error');
+      if (entered === profile.pass) {
+        document.getElementById('loginScreen').classList.remove('visible');
+        applyProfile(profile.name, profile.agency);
+        sessionAuthenticated = true;
+        errEl.style.display = 'none';
+      } else {
+        errEl.style.display = 'block';
+        const input = document.getElementById('login-pass');
+        input.classList.add('shake');
+        input.value = '';
+        updateDots();
+        setTimeout(() => input.classList.remove('shake'), 400);
+        input.focus();
+      }
+    }
+
+    function applyProfile(name, agency) {
+      // Personalize greeting and sidebar
+      document.querySelector('.logo-sub').textContent = agency;
+      document.querySelector('.sidebar-footer').innerHTML =
+        `<strong>${name}</strong>${agency}<br><span style="font-size:10px;opacity:0.5;">v2.1 — Agent Portal</span>`;
+      // Greet on dashboard
+      const hour = new Date().getHours();
+      const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+      document.querySelector('#page-dashboard .page-title').textContent = `${greeting}, ${name} 👋`;
+    }
+
+    function updateDots() {
+      const len = document.getElementById('login-pass').value.length;
+      for (let i = 0; i < 4; i++) {
+        document.getElementById('dot'+i).classList.toggle('filled', i < len);
+      }
+    }
+
+    function resetSetup() {
+      if (confirm('This will clear your name, agency, passcode, and all saved clients. Are you sure?')) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    // ════════════════════════════════════
     // INIT
     // ════════════════════════════════════
     refreshDashboard();
     renderClientTable();
+    initAuth();
 
   </script>
 </body>
