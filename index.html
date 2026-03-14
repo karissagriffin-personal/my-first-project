@@ -161,6 +161,16 @@
       color: #666;
     }
     .btn-clear:hover { background: #f0f0f0; }
+    .btn-dev {
+      background: none;
+      border: 1px dashed #aaa;
+      padding: 10px 16px;
+      border-radius: 5px;
+      font-size: 13px;
+      cursor: pointer;
+      color: #888;
+    }
+    .btn-dev:hover { background: #f5f0ff; border-color: #9b5de5; color: #9b5de5; }
 
     /* ── RESULTS PANEL ── */
     .results-panel {
@@ -900,6 +910,7 @@
 
       <div class="footer-bar">
         <button class="btn-clear" onclick="clearForm()">Clear Form</button>
+        <button class="btn-dev" onclick="devFill()" title="Auto-fill with test data">🧪 Dev Fill</button>
         <button class="btn-run" onclick="runQuotes()">⚡ Run Quotes</button>
       </div>
     </div><!-- end form-panel -->
@@ -1034,6 +1045,82 @@
       const banner = document.getElementById('validationBanner');
       if (banner) banner.style.display = 'none';
       document.getElementById('resultsPanel').classList.remove('visible');
+    }
+
+    // ── DEV FILL ──
+    function devFill() {
+      const firstNames = ['James','Maria','DeShawn','Priya','Carlos','Ashley','Tyler','Nguyen','Brittany','Marcus'];
+      const lastNames  = ['Johnson','Williams','Patel','Garcia','Thompson','Kim','Davis','Okafor','Martinez','Reed'];
+      const streets    = ['142 Maple St','3801 Oak Ave','27 Elm Blvd','5500 Pine Rd','88 Cedar Ln'];
+      const cities     = { VA: 'Richmond', TX: 'Austin', TN: 'Nashville', IN: 'Indianapolis', IL: 'Chicago', OH: 'Columbus', GA: 'Atlanta' };
+      const zips       = { VA: '23220', TX: '78701', TN: '37201', IN: '46201', IL: '60601', OH: '43215', GA: '30301' };
+      const makes      = ['Toyota','Honda','Ford','Chevrolet','Nissan','Hyundai','Kia','Subaru'];
+      const models     = { Toyota:['Camry','Corolla','RAV4'], Honda:['Civic','Accord','CR-V'], Ford:['F-150','Escape','Fusion'], Chevrolet:['Silverado','Malibu','Equinox'], Nissan:['Altima','Sentra','Rogue'], Hyundai:['Elantra','Sonata','Tucson'], Kia:['Optima','Soul','Sportage'], Subaru:['Outback','Forester','Impreza'] };
+      const carriers   = ['Elephant Insurance','State Farm','Allstate','GEICO','Progressive'];
+
+      function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+      function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+      const state = pick(['VA','TX','TN','IN','IL','OH','GA']);
+      const make  = pick(makes);
+      const model = pick(models[make]);
+      const year  = randInt(2010, 2024);
+      const dobYear = randInt(1965, 2000);
+      const dobMonth = String(randInt(1,12)).padStart(2,'0');
+      const dobDay   = String(randInt(1,28)).padStart(2,'0');
+
+      // Applicant
+      document.getElementById('firstName').value      = pick(firstNames);
+      document.getElementById('lastName').value       = pick(lastNames);
+      document.getElementById('dob').value            = `${dobYear}-${dobMonth}-${dobDay}`;
+      document.getElementById('gender').value         = pick(['Male','Female']);
+      document.getElementById('maritalStatus').value  = pick(['Single','Married','Married','Divorced']);
+      document.getElementById('address').value        = pick(streets);
+      document.getElementById('city').value           = cities[state];
+      document.getElementById('state').value          = state;
+      document.getElementById('zip').value            = zips[state];
+      document.getElementById('homeType').value       = pick(['Own Home','Rent','Rent','Live with Parents']);
+      document.getElementById('email').value          = 'test@example.com';
+      document.getElementById('phone').value          = '555-867-5309';
+
+      // Update garaging ZIP label
+      const garagingOpt = document.getElementById('garagingZipSame');
+      garagingOpt.textContent = `Same as Applicant ZIP (${zips[state]})`;
+
+      // Vehicle
+      document.getElementById('vehicleYear').value      = year;
+      document.getElementById('vehicleMake').value      = make;
+      document.getElementById('vehicleModel').value     = model;
+      document.getElementById('vehicleOwnership').value = pick(['Owned','Financed','Financed','Leased']);
+      document.getElementById('vehicleUse').value       = pick(['Commute','Commute','Pleasure','Business']);
+      document.getElementById('annualMileage').value    = pick(['10000','12500','15000','7500']);
+      document.getElementById('garagingZipSelect').value = 'same';
+      document.getElementById('garagingZipManual').style.display = 'none';
+
+      // Drivers
+      document.getElementById('licenseState').value     = state;
+      document.getElementById('ageLicensed').value      = randInt(16, 18);
+      document.getElementById('violations').value       = pick(['none','none','none','ticket','accident']);
+      document.getElementById('sr22').value             = 'no';
+      document.getElementById('currentlyInsured').value = 'yes';
+      document.getElementById('currentCarrier').value   = pick(carriers);
+      document.getElementById('yearsInsured').value     = pick(['1-2','3-5','3-5','6+']);
+      document.getElementById('shoppingReason').value   = pick(['Price','Renewal','New Vehicle']);
+
+      // Coverage — leave sensible defaults, just set effective date
+      const today = new Date();
+      today.setDate(today.getDate() + 1);
+      document.getElementById('effectiveDate').value = today.toISOString().split('T')[0];
+
+      // Clear any leftover errors
+      document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
+      document.querySelectorAll('.error-msg').forEach(e => e.remove());
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('has-error'));
+      const banner = document.getElementById('validationBanner');
+      if (banner) banner.style.display = 'none';
+
+      // Jump to Applicant tab so user can see what filled in
+      switchTab('applicant');
     }
 
     // ── RATING ENGINE ──
